@@ -3,6 +3,7 @@ from fastapi import FastAPI
 
 # Routes
 import routes.webhook as webhook_route
+import routes.user as user_route
 
 # Middlewares
 from middlewares.cors import cors_middleware
@@ -15,3 +16,4 @@ app.add_middleware(cors, **cors_config)
 
 # Include routes
 app.include_router(webhook_route.router)
+app.include_router(user_route.router)
