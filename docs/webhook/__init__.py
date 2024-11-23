@@ -1,0 +1,1 @@
+from .cryptocurrencyalert_new_coin import cryptocurrentalert_new_coin_doc
