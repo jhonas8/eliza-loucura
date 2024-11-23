@@ -5,3 +5,4 @@ class Tags(str, Enum):
     USERS = "Users"
     EXCHANGES = "Exchanges"
     WEBHOOKS = "Webhooks"
+    NOTIFICATIONS = "Notifications"

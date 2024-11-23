@@ -3,7 +3,7 @@ from application_types.tags import Tags
 get_notifications_doc = {
     "summary": "Get notifications history",
     "description": "Retrieve paginated list of notifications",
-    "tags": [Tags.WEBHOOKS],
+    "tags": [Tags.NOTIFICATIONS],
     "responses": {
         200: {
             "description": "List of notifications retrieved successfully",

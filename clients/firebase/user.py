@@ -1,7 +1,7 @@
 import uuid
 
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 from dtos.user import UserCreate, UserUpdate
 from application_types.enums import FirebaseCollectionEnum
 from clients.firebase.base_client import BaseFirebaseClient
@@ -30,7 +30,7 @@ class FirebaseUserClient(BaseFirebaseClient):
                 return doc.to_dict() | {"id": doc.id}
         return None
 
-    async def update_or_create_user(self, identifier: str, user_data: UserUpdate | UserCreate) -> Dict[str, Any]:
+    async def update_or_create_user(self, identifier: str, user_data: Union[UserUpdate, UserCreate]) -> Dict[str, Any]:
         existing_user = await self.get_user_by_identifier(identifier)
         current_time = datetime.utcnow()
 
