@@ -1,7 +1,8 @@
 import uuid
-
+import base64
+import json
 from datetime import datetime
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, List, Tuple
 from dtos.user import UserCreate, UserUpdate
 from application_types.enums import FirebaseCollectionEnum
 from clients.firebase.base_client import BaseFirebaseClient
@@ -13,6 +14,7 @@ class FirebaseUserClient(BaseFirebaseClient):
         self.db = self.get_db_instance()
         self.collection = self.db.collection(
             FirebaseCollectionEnum.USERS.value)
+        self.PAGE_SIZE = 10
 
     async def get_user_by_identifier(self, identifier: str) -> Optional[Dict[str, Any]]:
         # Try to find by ID first
@@ -58,3 +60,43 @@ class FirebaseUserClient(BaseFirebaseClient):
 
             self.collection.document(new_user['id']).set(new_user)
             return new_user
+
+    async def get_users_by_exchange(self, exchange: str, page_token: Optional[str] = None) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+        # Build base query
+        query = self.collection.where(
+            'allowed_exchanges', 'array_contains', exchange)
+
+        # If page token exists, decode and apply start_after
+        if page_token:
+            try:
+                decoded = json.loads(base64.b64decode(
+                    page_token).decode('utf-8'))
+                last_doc = self.collection.document(decoded['last_id']).get()
+                if last_doc.exists:
+                    query = query.start_after(last_doc)
+            except Exception as e:  # Handle any decoding/parsing error
+                print(f"Error decoding page token: {e}")
+                raise ValueError("Invalid page token")
+
+        # Get one more item to determine if there are more pages
+        docs = query.order_by('created_at').limit(self.PAGE_SIZE + 1).get()
+
+        # Convert to list to handle pagination
+        all_docs = list(docs)
+
+        # Determine if there are more results
+        has_more = len(all_docs) > self.PAGE_SIZE
+        results = all_docs[:self.PAGE_SIZE]  # Remove the extra item
+
+        # Generate next page token if there are more results
+        next_token = None
+        if has_more and results:
+            last_doc = results[-1]
+            token_data = {'last_id': last_doc.id}
+            next_token = base64.b64encode(
+                json.dumps(token_data).encode()).decode()
+
+        # Format results
+        users = [doc.to_dict() | {"id": doc.id} for doc in results]
+
+        return users, next_token

@@ -1,7 +1,8 @@
-from fastapi import APIRouter
-from dtos.user import UserUpdate, UserResponse
+from fastapi import APIRouter, Query
+from typing import Optional
+from dtos.user import UserUpdate, UserResponse, UserListResponse
 import controllers.user as user_controller
-from docs.user import get_user_details_doc, update_user_doc
+from docs.user import get_user_details_doc, update_user_doc, get_users_by_exchange_doc
 
 router = APIRouter()
 
@@ -14,3 +15,12 @@ async def get_user_details(identifier: str) -> UserResponse:
 @router.put("/users/{identifier}", **update_user_doc)
 async def update_user(identifier: str, user_data: UserUpdate) -> UserResponse:
     return await user_controller.update_user(identifier, user_data)
+
+
+@router.get("/users/by-exchange/{exchange}", **get_users_by_exchange_doc)
+async def get_users_by_exchange(
+    exchange: str,
+    page_token: Optional[str] = Query(
+        None, description="Token for the next page")
+) -> UserListResponse:
+    return await user_controller.get_users_by_exchange(exchange, page_token)

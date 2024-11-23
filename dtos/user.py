@@ -26,3 +26,8 @@ class UserResponse(UserBase):
     unique_identifier: str
     created_at: datetime
     updated_at: datetime
+
+
+class UserListResponse(BaseModel):
+    items: List[UserResponse]
+    next_page_token: Optional[str] = None
