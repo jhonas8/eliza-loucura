@@ -9,6 +9,9 @@ from middlewares.cors import cors_middleware
 
 app = FastAPI()
 
-app.add_middleware(*cors_middleware(app))
+# Add middlewares
+cors, cors_config = cors_middleware(app)
+app.add_middleware(cors, **cors_config)
 
+# Include routes
 app.include_router(webhook_route.router)

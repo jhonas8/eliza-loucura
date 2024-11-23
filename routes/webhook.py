@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 import controllers.webhook as webhook_controller
 import docs.webhook as webhook_docs
 
