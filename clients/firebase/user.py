@@ -1,14 +1,16 @@
-from datetime import datetime
 import uuid
+
+from datetime import datetime
 from typing import Optional, Dict, Any
-from firebase_admin import firestore
 from dtos.user import UserCreate, UserUpdate
 from application_types.enums import FirebaseCollectionEnum
+from clients.firebase.base_client import BaseFirebaseClient
 
 
-class FirebaseUserClient:
+class FirebaseUserClient(BaseFirebaseClient):
     def __init__(self):
-        self.db = firestore.client()
+        super().__init__()
+        self.db = self.get_db_instance()
         self.collection = self.db.collection(
             FirebaseCollectionEnum.USERS.value)
 

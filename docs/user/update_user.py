@@ -1,9 +1,11 @@
 from dtos.user import UserResponse
+from application_types.tags import Tags
 
 update_user_doc = {
     "summary": "Update user",
     "description": "Update user details by ID or unique identifier. Creates new user if not exists.",
     "response_model": UserResponse,
+    "tags": [Tags.USERS],
     "responses": {
         200: {
             "description": "User updated successfully",

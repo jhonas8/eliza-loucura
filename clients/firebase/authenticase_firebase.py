@@ -21,6 +21,7 @@ def authenticate_firebase():
     cred = credentials.Certificate(firebase_secret_data)
 
     try:
+        print(f"Initializing Firebase app")
         # App doesn't exist, initialize the app with the desired client name
         initialize_app(cred, {
             'storageBucket': 'fevercall.appspot.com'

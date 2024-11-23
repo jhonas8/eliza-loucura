@@ -1,9 +1,11 @@
 from dtos.user import UserResponse
+from application_types.tags import Tags
 
 get_user_details_doc = {
     "summary": "Get user details",
     "description": "Retrieve user details by ID or unique identifier",
     "response_model": UserResponse,
+    "tags": [Tags.USERS],
     "responses": {
         200: {
             "description": "User details retrieved successfully",

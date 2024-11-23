@@ -1,7 +1,10 @@
+from application_types.tags import Tags
+
 cryptocurrentalert_new_coin_doc = {
     "summary": "Process new cryptocurrency coin alerts",
     "description": "Handles notifications for newly listed cryptocurrencies on supported exchanges",
     "response_description": "Confirmation of new coin alert processing",
+    "tags": [Tags.WEBHOOKS],
     "responses": {
         200: {
             "description": "New coin alert successfully processed",
