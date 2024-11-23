@@ -1,0 +1,12 @@
+aiohttp==3.8.1
+fastapi==0.111.0
+firebase_admin==6.1.0
+google_api_python_client==2.103.0
+gspread==6.1.2
+oauth2client==4.1.3
+openai==1.30.5
+prompt==0.4.1
+pyTelegramBotAPI==4.11.0
+python-dotenv==1.0.1
+stripe==7.9.0
+pytz==2024.1
