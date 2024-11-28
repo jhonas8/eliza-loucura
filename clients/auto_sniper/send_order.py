@@ -9,7 +9,8 @@ def send_open_position_order_prod(
     created_at: str,
     model: Literal["tx1", "kx1", "lx1"],
     socials: Dict[str, Optional[str]],
-    market_cap: str
+    market_cap: str,
+    exchange: str
 ) -> None:
     url = "https://auto-sniper-api-499636776518.europe-west6.run.app/open-position-order"
 
@@ -20,7 +21,8 @@ def send_open_position_order_prod(
         "createdAt": created_at,
         "model": model,
         "socials": socials,
-        "marketCap": market_cap
+        "marketCap": market_cap,
+        "exchange": exchange
     }
 
     try:

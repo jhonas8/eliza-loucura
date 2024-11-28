@@ -68,6 +68,7 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
         # Extract socials and market cap
         socials = extract_socials_from_coingecko(coin_info)
         market_cap = get_market_cap(coin_info)
+        exchange = notification_data.get('exchange', '')
 
         # Create timestamp
         created_at = str(int(time.time()))
@@ -80,7 +81,8 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
             created_at=created_at,
             model="lx1",
             socials=socials,
-            market_cap=market_cap
+            market_cap=market_cap,
+            exchange=exchange
         )
 
         print(f"Successfully processed notification for token {token_address}")
