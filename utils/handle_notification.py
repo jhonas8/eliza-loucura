@@ -74,16 +74,16 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
         created_at = str(int(time.time()))
 
         # Send order
-        send_open_position_order_prod(
-            chain="solana",
-            token_address=token_address,
-            trading_decision="buy",
-            created_at=created_at,
-            model="lx1",
-            socials=socials,
-            market_cap=market_cap,
-            exchange=exchange
-        )
+        # send_open_position_order_prod(
+        #     chain="solana",
+        #     token_address=token_address,
+        #     trading_decision="buy",
+        #     created_at=created_at,
+        #     model="lx1",
+        #     socials=socials,
+        #     market_cap=market_cap,
+        #     exchange=exchange
+        # )
 
         print(f"Successfully processed notification for token {token_address}")
 
