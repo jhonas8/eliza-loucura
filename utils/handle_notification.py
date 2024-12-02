@@ -2,7 +2,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 import time
 from clients.coingecko.get_coin_info import get_coin_info
-from clients.auto_sniper.send_order import send_open_position_order_prod
+from clients.auto_sniper.send_order import send_open_position_order_prod, send_open_position_order_stg
 
 
 def is_solana_chain(notification: Dict[str, Any]) -> bool:
@@ -16,45 +16,46 @@ def is_solana_chain(notification: Dict[str, Any]) -> bool:
 def extract_socials_from_coingecko(coin_info: Dict[str, Any]) -> Dict[str, Optional[str]]:
     socials: Dict[str, Optional[str]] = {"ws": None, "x": None, "tg": None}
 
-    if not coin_info.get('data'):
-        return socials
+    if not coin_info.get('data') or not coin_info['data']:
+        return {k: "" for k, v in socials.items()}
 
-    for item in coin_info['data']:
-        attributes = item.get('attributes', {})
+    # Get base token ID from relationships
+    base_token_id = coin_info['data'][0].get('relationships', {}).get(
+        'base_token', {}).get('data', {}).get('id')
 
-        # Get website
-        websites = attributes.get('websites', [])
-        if websites:
-            socials['ws'] = websites[0]
+    if not base_token_id:
+        return {k: "" for k, v in socials.items()}
 
-        # Get Twitter
-        twitter = attributes.get('twitter_handle')
-        if twitter:
-            socials['x'] = f"x.com/{twitter}"
-
-        # Get Telegram
-        telegram = attributes.get('telegram_handle')
-        if telegram:
-            socials['tg'] = telegram
-
-        break  # Use first item only
-
-    # Convert None to empty string for the API requirement
-    return {k: v if v is not None else "" for k, v in socials.items()}
+    # TODO: You'll need to make another API call to get token details using base_token_id
+    # For now, returning empty strings as per API requirement
+    return {k: "" for k, v in socials.items()}
 
 
 def get_market_cap(coin_info: Dict[str, Any]) -> str:
-    # This is a placeholder as the sample response doesn't show market cap
-    # You might need to adjust this based on actual CoinGecko response
-    return "0"
+    if not coin_info.get('data'):
+        return "0"
+
+    attributes = coin_info['data'][0].get('attributes', {})
+    # Use fdv_usd (Fully Diluted Valuation) as market cap
+    market_cap = attributes.get('fdv_usd', '0')
+    return str(market_cap)
+
+
+def get_chain(notification_data: Dict[str, Any]) -> str:
+    chain = notification_data.get('blockchain', 'solana')
+
+    return chain
+
+
+def treat_exchange(exchange: str) -> str:
+    return exchange.lower().replace(' ', '-')
+
+
+def treat_chain(chain: str) -> str:
+    return chain.lower()
 
 
 async def handle_notification(notification_data: Dict[str, Any]) -> None:
-    # Check if it's a Solana chain notification
-    if not is_solana_chain(notification_data):
-        print("Skipping non-Solana notification")
-        return
-
     # Extract token address
     token_address = notification_data.get('currency_address')
     if not token_address:
@@ -62,20 +63,43 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
         return
 
     try:
+        chain = get_chain(notification_data)
         # Get additional details from CoinGecko
-        coin_info = get_coin_info(token_address)
+        coin_info = get_coin_info(token_address, chain)
+        print(f"Coin info: {coin_info}")
+        if not coin_info.get('data'):
+            print(f"No data found for {token_address} on {chain}")
+            return
 
         # Extract socials and market cap
         socials = extract_socials_from_coingecko(coin_info)
         market_cap = get_market_cap(coin_info)
         exchange = notification_data.get('exchange', '')
 
+        print(f"Socials: {socials}")
+        print(f"Market cap: {market_cap}")
+        print(f"Exchange: {exchange}")
+
+        exchange = treat_exchange(exchange)
+        chain = treat_chain(chain)
+
         # Create timestamp
         created_at = str(int(time.time()))
 
         # Send order
         send_open_position_order_prod(
-            chain="solana",
+            chain=chain,
+            token_address=token_address,
+            trading_decision="buy",
+            created_at=created_at,
+            model="lx1",
+            socials=socials,
+            market_cap=market_cap,
+            exchange=exchange
+        )
+
+        send_open_position_order_stg(
+            chain=chain,
             token_address=token_address,
             trading_decision="buy",
             created_at=created_at,

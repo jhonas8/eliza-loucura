@@ -3,7 +3,8 @@ from utils.get_env_var import get_env_var
 from typing import Dict, Any
 
 
-def get_coin_info(token_address: str, chain: str = 'solana') -> Dict[str, Any]:
+def get_coin_info(token_address: str, chain: str = 'sol') -> Dict[str, Any]:
+    print(f"Getting coin info for {token_address} on {chain}")
     url = f"https://pro-api.coingecko.com/api/v3/onchain/networks/{chain}/tokens/{token_address}/pools"
 
     api_key = get_env_var('COINGECKO_API_KEY')

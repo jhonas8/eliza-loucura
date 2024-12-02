@@ -5,36 +5,20 @@ from fastapi import Request
 
 SAMPLE_NOTIFICATIONS: List[Dict[str, Any]] = [
     {
-        "id": "aXQVZGtit4qfuaaZ9q0l",
+        "id": "04jp5K771F6nKFDpmMgQ",
         "data": {
             "alert_condition_id": 2040394,
             "listing_type": "listing",
-            "message": "YouLive Coin (UC) has been listed on LBank!",
+            "message": "dogwifhat",
             "type": "new_coin",
-            "trading_pair_url": "https://lbank.com/trade/uc_usdt/",
-            "currency_address": "0xf84df2db2c87dd650641f8904af71ebfc3dde0ea",
-            "currency": "UC",
-            "currency_name": "YouLive Coin",
-            "blockchain": "Ethereum",
-            "exchange": "LBank"
+            "trading_pair_url": "https://www.coingecko.com/en/coins/dogwifhat/",
+            "currency_address": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+            "currency": "DOGWIFHAT",
+            "currency_name": "Dogwifhat",
+            "blockchain": "solana",
+            "exchange": "Binance"
         },
-        "created_at": "2024-11-24T09:54:16.438438Z"
-    },
-    {
-        "id": "SuKrZq1nr5xFmsHOi3OZ",
-        "data": {
-            "alert_condition_id": 2040394,
-            "listing_type": "listing",
-            "message": "Kirby Inu (KIRBY) has been listed on Biconomy Exchange!",
-            "type": "new_coin",
-            "trading_pair_url": "https://www.biconomy.com/exchange?coin=KIRBY_USDT",
-            "currency_address": "0x1fd7e8c718c153fa97a5525c227a098007dcfdda",
-            "currency": "KIRBY",
-            "currency_name": "Kirby Inu",
-            "blockchain": "Ethereum",
-            "exchange": "Biconomy Exchange"
-        },
-        "created_at": "2024-11-24T09:35:25.308977Z"
+        "created_at": "2024-11-24T08:49:26.074960Z"
     }
 ]
 
