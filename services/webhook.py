@@ -1,6 +1,7 @@
 from fastapi import Request
 from clients.firebase.notification import FirebaseNotificationClient
 from utils.handle_notification import handle_notification
+from utils.send_notification import send_notification
 from clients.firebase.webhook_endpoint import FirebaseWebhookEndpointClient
 from dtos.webhook_endpoint import WebhookEndpointCreate, WebhookEndpointResponse
 
@@ -13,8 +14,11 @@ async def cryptocurrencyalert_new_coin(request: Request):
     notification_client = FirebaseNotificationClient()
     saved_notification = await notification_client.save_notification(data)
 
-    # Handle notification
+    # Handle notification for internal processing
     await handle_notification(data)
+
+    # Forward notification to registered webhooks
+    await send_notification(data)
 
     return {"message": "Webhook received and processed"}
 

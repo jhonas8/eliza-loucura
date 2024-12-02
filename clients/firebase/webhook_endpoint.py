@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from application_types.enums import FirebaseCollectionEnum
 from clients.firebase.base_client import BaseFirebaseClient
 
@@ -22,3 +22,8 @@ class FirebaseWebhookEndpointClient(BaseFirebaseClient):
         }
         doc_ref.set(endpoint_data)
         return endpoint_data | {"id": doc_ref.id}
+
+    async def get_all_endpoints(self) -> List[Dict[str, Any]]:
+        """Retrieve all registered webhook endpoints"""
+        docs = self.collection.get()
+        return [doc.to_dict() | {"id": doc.id} for doc in docs]
