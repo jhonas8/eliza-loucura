@@ -10,7 +10,7 @@ async def send_notification_to_endpoint(session: aiohttp.ClientSession, url: str
         async with session.post(url, json=data) as response:
             if response.status >= 400:
                 print(
-                    f"Failed to send notification to {url}. Status: {response.status}")
+                    f"Failed to send notification to {url}. Status: {response.status}. Error: {response.text}")
                 return
 
             print(f"Successfully sent notification to {url}")

@@ -12,7 +12,8 @@ async def cryptocurrencyalert_new_coin(request: Request):
 
     # Save notification
     notification_client = FirebaseNotificationClient()
-    saved_notification = await notification_client.save_notification(data)
+
+    await notification_client.save_notification(data)
 
     # Handle notification for internal processing
     await handle_notification(data)
