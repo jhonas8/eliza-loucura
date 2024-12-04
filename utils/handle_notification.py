@@ -62,6 +62,7 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
     token_address = notification_data.get('currency_address')
 
     dextools_address = get_information_from_dexscreener(token_address)
+    print(f"Dextools address: {dextools_address}")
 
     token_address = dextools_address if dextools_address else token_address
 
