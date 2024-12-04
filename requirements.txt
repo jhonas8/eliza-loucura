@@ -10,3 +10,4 @@ pyTelegramBotAPI==4.11.0
 python-dotenv==1.0.1
 stripe==7.9.0
 pytz==2024.1
+requests==2.32.3 

@@ -1,8 +1,10 @@
+import time
+
 from typing import Dict, Any, Optional
 from datetime import datetime
-import time
 from clients.coingecko.get_coin_info import get_coin_info
 from clients.auto_sniper.send_order import send_open_position_order_prod, send_open_position_order_stg
+from clients.dextools.get_information_from_scanner import get_information_from_dexscreener
 
 
 def is_solana_chain(notification: Dict[str, Any]) -> bool:
@@ -58,6 +60,11 @@ def treat_chain(chain: str) -> str:
 async def handle_notification(notification_data: Dict[str, Any]) -> None:
     # Extract token address
     token_address = notification_data.get('currency_address')
+
+    dextools_address = get_information_from_dexscreener(token_address)
+
+    token_address = dextools_address if dextools_address else token_address
+
     if not token_address:
         print("No token address found in notification")
         return
