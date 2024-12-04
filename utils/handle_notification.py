@@ -73,7 +73,7 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
     try:
         chain = get_chain(notification_data)
         # Get additional details from CoinGecko
-        coin_info = get_coin_info(token_address, chain)
+        coin_info = get_coin_info(token_address, chain.lower())
         print(f"Coin info: {coin_info}")
         if not coin_info.get('data'):
             print(f"No data found for {token_address} on {chain}")
