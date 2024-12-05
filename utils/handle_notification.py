@@ -106,16 +106,16 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
             return
 
         # Send order
-        send_open_position_order_prod(
-            chain=chain,
-            token_address=token_address,
-            trading_decision="buy",
-            created_at=created_at,
-            model="lx1",
-            socials=socials,
-            market_cap=market_cap,
-            exchange=exchange
-        )
+        # send_open_position_order_prod(
+        #     chain=chain,
+        #     token_address=token_address,
+        #     trading_decision="buy",
+        #     created_at=created_at,
+        #     model="lx1",
+        #     socials=socials,
+        #     market_cap=market_cap,
+        #     exchange=exchange
+        # )
 
         send_open_position_order_stg(
             chain=chain,
