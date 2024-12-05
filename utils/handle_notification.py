@@ -5,6 +5,7 @@ from datetime import datetime
 from clients.coingecko.get_coin_info import get_coin_info
 from clients.auto_sniper.send_order import send_open_position_order_prod, send_open_position_order_stg
 from clients.dextools.get_information_from_scanner import get_information_from_dexscreener
+from utils.check_for_repetition_by_token import check_for_repetition_by_token
 
 
 def is_solana_chain(notification: Dict[str, Any]) -> bool:
@@ -93,6 +94,16 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
 
         # Create timestamp
         created_at = str(int(time.time()))
+
+        repeated_notification_for_token_in_last_week = await check_for_repetition_by_token(
+            token_address=token_address,
+            days_ago=7
+        )
+
+        if repeated_notification_for_token_in_last_week:
+            print(
+                f"Notification for {token_address} already sent in the last 7 days")
+            return
 
         # Send order
         send_open_position_order_prod(

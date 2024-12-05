@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, List, Tuple
 from application_types.enums import FirebaseCollectionEnum
 from clients.firebase.base_client import BaseFirebaseClient
@@ -39,3 +39,14 @@ class FirebaseNotificationClient(BaseFirebaseClient):
         notifications = [doc.to_dict() | {"id": doc.id} for doc in docs]
 
         return notifications, total
+
+    async def check_for_last_notification_by_token(self, token_address: str, days_ago: int) -> List[Any]:
+        query = (self.collection
+                 .where('data.currency_address', '==', token_address)
+                 .where('created_at', '>=', datetime.utcnow() - timedelta(days=days_ago))
+                 .order_by('created_at', direction='DESCENDING')
+                 .limit(1))
+
+        docs = query.get()
+
+        return docs
