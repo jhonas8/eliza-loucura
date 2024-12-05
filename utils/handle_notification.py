@@ -58,7 +58,7 @@ def treat_chain(chain: str) -> str:
     return chain.lower()
 
 
-async def handle_notification(notification_data: Dict[str, Any]) -> None:
+async def handle_notification(notification_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     # Extract token address
     token_address = notification_data.get('currency_address')
 
@@ -103,7 +103,7 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
         if repeated_notification_for_token_in_last_week:
             print(
                 f"Notification for {token_address} already sent in the last 7 days")
-            return
+            return None
 
         # Send order
         # send_open_position_order_prod(
@@ -129,6 +129,8 @@ async def handle_notification(notification_data: Dict[str, Any]) -> None:
         )
 
         print(f"Successfully processed notification for token {token_address}")
+
+        return {**notification_data, "currency_address": token_address, "chain": chain}
 
     except Exception as e:
         print(f"Error processing notification: {str(e)}")

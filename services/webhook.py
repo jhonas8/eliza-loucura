@@ -13,13 +13,14 @@ async def cryptocurrencyalert_new_coin(request: Request):
     # Save notification
     notification_client = FirebaseNotificationClient()
 
-    await notification_client.save_notification(data)
-
     # Handle notification for internal processing
-    await handle_notification(data)
+    processed_notification = await handle_notification(data)
 
-    # Forward notification to registered webhooks
-    await send_notification(data)
+    if processed_notification:
+        await notification_client.save_notification(processed_notification)
+
+        # Forward notification to registered webhooks
+        await send_notification(processed_notification)
 
     return {"message": "Webhook received and processed"}
 
