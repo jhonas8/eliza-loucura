@@ -24,6 +24,8 @@ async def send_notification(notification_data: Dict[str, Any]) -> None:
     client = FirebaseWebhookEndpointClient()
     endpoints = await client.get_all_endpoints()
 
+    print(f'notification data: {notification_data}')
+
     if not endpoints:
         print("No webhook endpoints registered")
         return
