@@ -18,9 +18,11 @@ async def cryptocurrencyalert_new_coin(request: Request):
 
     if processed_notification:
         await notification_client.save_notification(processed_notification)
+        print(f"Notification saved: {processed_notification}")
 
         # Forward notification to registered webhooks
         await send_notification(processed_notification)
+        print(f"Notification forwarded to webhooks: {processed_notification}")
 
     return {"message": "Webhook received and processed"}
 

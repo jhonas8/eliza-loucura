@@ -130,7 +130,7 @@ async def handle_notification(notification_data: Dict[str, Any]) -> Optional[Dic
 
         print(f"Successfully processed notification for token {token_address}")
 
-        return {**notification_data, "currency_address": token_address, "chain": chain}
+        return {**notification_data, "currency_address": token_address}
 
     except Exception as e:
         print(f"Error processing notification: {str(e)}")
