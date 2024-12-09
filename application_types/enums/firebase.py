@@ -7,6 +7,7 @@ def get_environment_suffix():
 
 
 class FirebaseCollectionEnum(str, Enum):
+    WEBHOOK_ENDPOINTS = f"xpaal-webhook-endpoints-{get_environment_suffix()}"
     USERS = f"xpaal-notifications-users-{get_environment_suffix()}"
     EXCHANGES = f"xpaal-possible-exchanges-{get_environment_suffix()}"
     NOTIFICATIONS = f"xpaal-notifications-history-{get_environment_suffix()}"
