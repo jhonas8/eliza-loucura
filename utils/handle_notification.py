@@ -109,16 +109,17 @@ async def handle_notification(notification_data: Dict[str, Any]) -> Optional[Dic
         # Send order
 
         if get_environment() == "PRODUCTION":
-            send_open_position_order_prod(
-                chain=chain,
-                token_address=token_address,
-                trading_decision="buy",
-                created_at=created_at,
-                model="lx1",
-                socials=socials,
-                market_cap=market_cap,
-                exchange=exchange
-            )
+            print('Sending order to production')
+            # send_open_position_order_prod(
+            #     chain=chain,
+            #     token_address=token_address,
+            #     trading_decision="buy",
+            #     created_at=created_at,
+            #     model="lx1",
+            #     socials=socials,
+            #     market_cap=market_cap,
+            #     exchange=exchange
+            # )
         else:
             send_open_position_order_stg(
                 chain=chain,
