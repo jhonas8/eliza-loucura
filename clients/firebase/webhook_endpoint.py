@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional, List
-from application_types.enums import FirebaseCollectionEnum
+from application_types.enums.firebase import FirebaseCollectionEnum
 from clients.firebase.base_client import BaseFirebaseClient
 
 
@@ -7,7 +7,8 @@ class FirebaseWebhookEndpointClient(BaseFirebaseClient):
     def __init__(self):
         super().__init__()
         self.db = self.get_db_instance()
-        self.collection = self.db.collection('xpaal-webhook-endpoints')
+        self.collection = self.db.collection(
+            FirebaseCollectionEnum.WEBHOOK_ENDPOINTS)
 
     async def create_endpoint(self, url: str, description: str) -> Dict[str, Any]:
         # Check if URL already exists
