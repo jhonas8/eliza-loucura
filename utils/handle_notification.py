@@ -59,6 +59,10 @@ def treat_chain(chain: str) -> str:
     return chain.lower()
 
 
+def treat_notification_data(notification_data: Dict[str, Any]) -> Dict[str, Any]:
+    return notification_data
+
+
 async def handle_notification(notification_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     # Extract token address
     token_address = notification_data.get('currency_address')
