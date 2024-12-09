@@ -15,3 +15,7 @@ def get_env_var(variable_name: str, fallback: Optional[str] = None) -> str:
         raise ValueError(f"Environment variable {variable_name} not set")
 
     return variable_value
+
+
+def get_environment():
+    return get_env_var("ENV", "PRODUCTION")

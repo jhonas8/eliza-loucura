@@ -6,6 +6,7 @@ from clients.coingecko.get_coin_info import get_coin_info
 from clients.auto_sniper.send_order import send_open_position_order_prod, send_open_position_order_stg
 from clients.dextools.get_information_from_scanner import get_information_from_dexscreener
 from utils.check_for_repetition_by_token import check_for_repetition_by_token
+from utils.get_env_var import get_environment
 
 
 def is_solana_chain(notification: Dict[str, Any]) -> bool:
@@ -106,27 +107,29 @@ async def handle_notification(notification_data: Dict[str, Any]) -> Optional[Dic
             return None
 
         # Send order
-        # send_open_position_order_prod(
-        #     chain=chain,
-        #     token_address=token_address,
-        #     trading_decision="buy",
-        #     created_at=created_at,
-        #     model="lx1",
-        #     socials=socials,
-        #     market_cap=market_cap,
-        #     exchange=exchange
-        # )
 
-        send_open_position_order_stg(
-            chain=chain,
-            token_address=token_address,
-            trading_decision="buy",
-            created_at=created_at,
-            model="lx1",
-            socials=socials,
-            market_cap=market_cap,
-            exchange=exchange
-        )
+        if get_environment() == "PRODUCTION":
+            send_open_position_order_prod(
+                chain=chain,
+                token_address=token_address,
+                trading_decision="buy",
+                created_at=created_at,
+                model="lx1",
+                socials=socials,
+                market_cap=market_cap,
+                exchange=exchange
+            )
+        else:
+            send_open_position_order_stg(
+                chain=chain,
+                token_address=token_address,
+                trading_decision="buy",
+                created_at=created_at,
+                model="lx1",
+                socials=socials,
+                market_cap=market_cap,
+                exchange=exchange
+            )
 
         print(f"Successfully processed notification for token {token_address}")
 
