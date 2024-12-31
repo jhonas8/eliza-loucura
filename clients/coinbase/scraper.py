@@ -86,10 +86,11 @@ class CoinbaseScraper(BaseScraper):
                     temperature=0.1  # Lower temperature for more precise extraction
                 )
 
-                result = response.choices[0].message.content.strip()
+                result = response.choices[0].message.content.strip(
+                ) if response.choices[0].message.content else None
                 print(f"GPT-4 Response: {result}")
 
-                if result.lower() == "none":
+                if not result or result.lower() == "none":
                     return []
 
                 tokens = []
