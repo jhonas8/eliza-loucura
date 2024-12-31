@@ -157,39 +157,78 @@ class BinanceScraper(BaseScraper):
             print("\nArticle content:")
             print(content[:500] + "..." if len(content) > 500 else content)
 
-            # First find all Solana addresses using regex
+            # Common patterns that indicate a token address
+            address_indicators = [
+                r'Contract Address',
+                r'Token Address',
+                r'Token Contract',
+                r'SPL Token',
+                r'Solana Address',
+                r'Contract:'
+            ]
+
             import re
-            solana_address_pattern = r'[1-9A-HJ-NP-Za-km-z]{32,44}'
-            addresses = re.findall(solana_address_pattern, content)
+            # More strict length
+            solana_address_pattern = r'[1-9A-HJ-NP-Za-km-z]{43,44}'
 
-            print(f"\nFound {len(addresses)} potential Solana addresses:")
-            for addr in addresses:
-                print(f"- {addr}")
+            # Find paragraphs or sections that might contain token info
+            potential_sections = []
 
-            if not addresses:
-                print("No Solana addresses found in content")
+            # Split content into paragraphs/sections
+            sections = re.split(r'\n\s*\n', content)
+
+            for section in sections:
+                # Check if section contains any address indicators
+                if any(re.search(indicator, section, re.IGNORECASE) for indicator in address_indicators):
+                    potential_sections.append(section)
+                    print(f"\nFound potential token section:\n{section}")
+
+            if not potential_sections:
+                print("No sections with token information found")
                 return []
 
-            # Now use GPT to match addresses with token names/symbols
-            addresses_text = "\n".join([f"- {addr}" for addr in addresses])
+            addresses = []
+            for section in potential_sections:
+                # Look for addresses only in relevant sections
+                found_addresses = re.findall(solana_address_pattern, section)
+                for addr in found_addresses:
+                    # Additional validation
+                    # Exclude common confusion characters
+                    if len(addr) in [43, 44] and not re.search(r'[0OIl]', addr):
+                        addresses.append((addr, section))  # Keep the context
+
+            if not addresses:
+                print("No valid Solana addresses found")
+                return []
+
+            print(
+                f"\nFound {len(addresses)} potential Solana addresses with context:")
+            for addr, context in addresses:
+                print(f"\nAddress: {addr}")
+                print(f"Context: {context[:100]}...")
+
+            # Create a more structured prompt with context
+            addresses_with_context = "\n\n".join([
+                f"Address: {addr}\nContext: {ctx[:200]}..."
+                for addr, ctx in addresses
+            ])
+
             prompt = f"""
-            Match token names and symbols with these Solana addresses found in the announcement:
+            Analyze these potential Solana token addresses and their context from the announcement:
 
-            Addresses:
-            {addresses_text}
+            {addresses_with_context}
 
-            Announcement content:
-            {content}
+            Rules for matching:
+            1. Only match addresses that are explicitly identified as token/contract addresses
+            2. Look for clear token name and symbol mentions near the address
+            3. Ignore addresses that appear to be wallet addresses or other types
+            4. Only include tokens that are being listed (not just mentioned)
             
             Respond with token information in this format:
             TOKEN_NAME|TOKEN_SYMBOL|TOKEN_ADDRESS
             
-            Rules:
-            - Only include tokens where you can confidently match name/symbol to address
-            - Names and symbols must appear in the text
-            - Only use addresses from the provided list
-            - If no matches found, respond with "none"
-            - Do not include any explanations
+            If no clear token listings found, respond with "none"
+            Do not include any explanations
             """
 
             response = await self.openai.chat.completions.create(
@@ -207,13 +246,19 @@ class BinanceScraper(BaseScraper):
                 for line in result.split('\n'):
                     if '|' in line:
                         name, symbol, address = line.strip().split('|')
-                        # Verify the address matches our regex pattern
-                        if re.match(solana_address_pattern, address.strip()):
+                        # Final validation
+                        if (
+                            re.match(solana_address_pattern, address.strip()) and
+                            len(address.strip()) in [43, 44] and
+                            not re.search(r'[0OIl]', address.strip())
+                        ):
                             tokens.append(
                                 (symbol.strip(), name.strip(), address.strip()))
-                            print(f"Matched: {name} ({symbol}) - {address}")
+                            print(
+                                f"Validated token: {name} ({symbol}) - {address}")
                         else:
-                            print(f"Invalid Solana address format: {address}")
+                            print(
+                                f"Invalid or suspicious address format: {address}")
 
             return tokens
 
