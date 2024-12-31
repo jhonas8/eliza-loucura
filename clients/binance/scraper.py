@@ -18,24 +18,25 @@ class BinanceScraper(BaseScraper):
         print("\nFetching recent Binance announcements...")
 
         try:
+            # Get full page content without waiting for a specific selector
             content = self.get_rendered_content(
                 self.announcements_url,
-                selector='.typography-body1-1',  # Target the announcement titles
                 wait_time=30
             )
 
+            print(f"Got page content, length: {len(content)}")
             soup = BeautifulSoup(content, 'html.parser')
             articles = []
 
-            # Look for announcement links within the cards
-            for article in soup.select('.bn-flex.flex-col.gap-1'):
-                try:
-                    link_el = article.select_one('a')
-                    if not link_el:
-                        continue
+            # Look for all announcement links with the specific class combination
+            links = soup.select(
+                'a.text-PrimaryText.hover\\:text-PrimaryYellow.active\\:text-PrimaryYellow.focus\\:text-PrimaryYellow.cursor-pointer.no-underline.w-fit')
+            print(f"Found {len(links)} announcement links")
 
-                    title_el = link_el.select_one(
-                        '.typography-body1-1')
+            for link_el in links:
+                try:
+                    # Get title from h3 element inside anchor
+                    title_el = link_el.select_one('h3')
                     if not title_el:
                         continue
 
@@ -43,6 +44,9 @@ class BinanceScraper(BaseScraper):
                     link = link_el.get('href', '')
 
                     if link and title:
+                        print(f"Link: {link}")
+                        print(f"Title: {title}")
+
                         if isinstance(link, list):
                             link = link[0]
 
@@ -102,7 +106,7 @@ class BinanceScraper(BaseScraper):
             """
 
             response = await self.openai.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.1
             )
@@ -174,12 +178,13 @@ class BinanceScraper(BaseScraper):
             """
 
             response = await self.openai.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.1
             )
 
-            result = response.choices[0].message.content.strip()
+            result = response.choices[0].message.content.strip(
+            ) if response.choices[0].message.content else None
             print(f"\nGPT Token Extraction Response: {result}")
 
             tokens = []
