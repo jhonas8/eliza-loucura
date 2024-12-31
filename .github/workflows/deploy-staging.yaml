@@ -21,4 +21,4 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy watch-new-coins-paal-staging --source . --platform managed --region us-east1 --allow-unauthenticated --set-secrets=FIREBASE_SECRET_PAAL_BASE64=FIREBASE_SECRET_PAAL_BASE64:latest,MYPAAL_API_KEY=MYPAAL_API_KEY:latest,COINGECKO_API_KEY=COINGECKO_API_KEY:latest --set-env-vars=ENV=STAGING
+          gcloud run deploy watch-new-coins-paal-staging --source . --platform managed --region us-east1 --allow-unauthenticated --set-secrets=FIREBASE_SECRET_PAAL_BASE64=FIREBASE_SECRET_PAAL_BASE64:latest,MYPAAL_API_KEY=MYPAAL_API_KEY:latest,COINGECKO_API_KEY=COINGECKO_API_KEY:latest,GPT_API_KEY=OPENAI_API_KEY:latest --set-env-vars=ENV=STAGING
