@@ -4,32 +4,22 @@ from typing import List, Dict, Any, Union
 import openai
 from utils.get_env_var import get_env_var
 from clients.dextools.get_information_from_scanner import get_information_from_dexscreener
+from clients.base_scraper import BaseScraper
 
 
-class BinanceScraper:
+class BinanceScraper(BaseScraper):
     def __init__(self):
+        super().__init__()  # Call parent class init to set up headers
         self.base_url = "https://www.binance.com"
         self.listing_url = f"{self.base_url}/en/support/announcement/new-cryptocurrency-listing"
         self.openai = openai.AsyncOpenAI(api_key=get_env_var('OPENAI_API_KEY'))
 
     async def get_article_content(self, url: str) -> str:
-        """Get article content from URL"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                html = await response.text()
-                soup = BeautifulSoup(html, 'html.parser')
-
-                # Find the main article content
-                article = soup.find('article')
-                if not article:
-                    return ""
-
-                # Get all text content, including nested elements
-                content = []
-                for element in article.stripped_strings:
-                    content.append(element)
-
-                return " ".join(content)
+        """Get article content from URL using Playwright"""
+        return await self.get_rendered_content(
+            url,
+            selector='article.css-1ql2hru'  # Update this selector based on Binance's HTML
+        )
 
     async def extract_token_info(self, article_content: str) -> tuple[bool, Union[str, None], Union[str, None], Union[str, None]]:
         """Use ChatGPT to extract token information from article"""

@@ -2,142 +2,222 @@ import aiohttp
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Union
 import openai
+import re
 from utils.get_env_var import get_env_var
 from clients.dextools.get_information_from_scanner import get_information_from_dexscreener
+from clients.base_scraper import BaseScraper
 
 
-class CoinbaseScraper:
+class CoinbaseScraper(BaseScraper):
     def __init__(self):
+        super().__init__()
         self.base_url = "https://www.coinbase.com"
         self.listing_url = f"{self.base_url}/en-br/blog/increasing-transparency-for-new-asset-listings-on-coinbase"
         self.openai = openai.AsyncOpenAI(api_key=get_env_var('OPENAI_API_KEY'))
 
     async def get_article_content(self, url: str) -> str:
-        """Get article content from URL"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                html = await response.text()
-                soup = BeautifulSoup(html, 'html.parser')
+        """Get article content from URL using Selenium"""
+        # Since Selenium's get_rendered_content is synchronous, we need to handle it properly
+        content = self.get_rendered_content(
+            url,
+            selector='div.blog-post'
+        )
+        return content
 
-                # Find the main article content
-                article = soup.find('article') or soup.find(
-                    'div', class_='blog-post')
-                if not article:
-                    return ""
+    async def extract_solana_tokens_from_text(self, content: str) -> List[tuple[str, str, str]]:
+        """Extract Solana tokens using GPT-4"""
+        print("\nExtracting tokens using GPT-4...")
 
-                # Get all text content, including nested elements
-                content = []
-                for element in article.stripped_strings:
-                    content.append(element)
-
-                return " ".join(content)
-
-    async def extract_token_info(self, article_content: str) -> List[tuple[str, str, str]]:
-        """Use ChatGPT to extract token information from article"""
-        prompt = f"""
-        Analyze this Coinbase listing announcement and extract all tokens mentioned with their details.
-        For each token mentioned, provide:
-        1. Token symbol
-        2. Token name
-        3. Token address (if mentioned)
-
-        Only include tokens that have Solana addresses (starting with a base58 string).
-
-        Article content:
-        {article_content}
-
-        Format your response like this for each token:
-        symbol: token_symbol
-        name: token_name
-        address: solana_address
-
-        Separate multiple tokens with '---'
-        If no Solana tokens are found, respond with 'no_solana_tokens'
-        """
-
+        # First try to find the Solana section to reduce content size
         try:
-            response = await self.openai.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}]
+            # Find the section with Solana tokens
+            solana_section_match = re.search(
+                r"Assets on the Solana network.*?(?=Assets on|$)",
+                content,
+                re.DOTALL | re.IGNORECASE
             )
 
-            result = response.choices[0].message.content
-            if not result or 'no_solana_tokens' in result.lower():
-                return []
+            if solana_section_match:
+                content_for_gpt = solana_section_match.group(0)
+                print(f"\nFound Solana section: {content_for_gpt}")
+            else:
+                # If no specific section found, look for any mention of Solana and surrounding text
+                solana_mentions = re.finditer(
+                    r"solana", content, re.IGNORECASE)
+                extracted_sections = []
 
-            tokens = []
-            for token_info in result.split('---'):
-                if not token_info.strip():
-                    continue
+                for match in solana_mentions:
+                    start = max(0, match.start() - 500)  # Get 500 chars before
+                    # Get 500 chars after
+                    end = min(len(content), match.end() + 500)
+                    extracted_sections.append(content[start:end])
 
-                lines = token_info.strip().split('\n')
-                if len(lines) < 3:
-                    continue
+                content_for_gpt = "\n".join(
+                    extracted_sections) if extracted_sections else content[:8000]
+                print(
+                    f"\nUsing extracted content around Solana mentions: {content_for_gpt[:200]}...")
 
-                symbol = lines[0].split('symbol:')[1].strip()
-                name = lines[1].split('name:')[1].strip()
-                address = lines[2].split('address:')[1].strip()
+            prompt = f"""
+            You are a precise token information extractor. Your task is to find Solana token listings from Coinbase announcements.
+            
+            Extract the following information for each Solana token:
+            1. Exact token name as shown
+            2. Exact token symbol in parentheses
+            3. Exact contract/wallet address (must be a Solana address)
 
-                # Verify address with dexscreener if needed
-                if not address or address.lower() == 'none':
-                    address = get_information_from_dexscreener(symbol)
+            Current content:
+            {content_for_gpt}
 
-                if address:
-                    tokens.append((symbol, name, address))
+            Respond ONLY in this exact format, one token per line:
+            name|symbol|address
 
-            return tokens
+            Rules:
+            - Only include tokens that have both symbol AND address
+            - Addresses must be exact matches from the text
+            - Do not modify or clean addresses
+            - If no valid tokens found, respond with "none"
+            - Do not include any explanations or additional text
+            """
+
+            try:
+                response = await self.openai.chat.completions.create(
+                    model="gpt-4o",  # Using GPT-4 for better precision
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.1  # Lower temperature for more precise extraction
+                )
+
+                result = response.choices[0].message.content.strip()
+                print(f"GPT-4 Response: {result}")
+
+                if result.lower() == "none":
+                    return []
+
+                tokens = []
+                for line in result.split('\n'):
+                    if '|' in line:
+                        name, symbol, address = line.strip().split('|')
+                        name = name.strip()
+                        symbol = symbol.strip()
+                        address = address.strip()
+                        if all([name, symbol, address]):
+                            print(
+                                f"Found token: {name} ({symbol}) - {address}")
+                            tokens.append((symbol, name, address))
+
+                return tokens
+
+            except Exception as e:
+                print(f"Error with GPT-4 processing: {str(e)}")
+                # Fallback to regex extraction if GPT fails
+                return self._extract_tokens_with_regex(content_for_gpt)
+
         except Exception as e:
-            print(f"Error extracting token info: {str(e)}")
+            print(f"Error in content extraction: {str(e)}")
             return []
+
+    def _extract_tokens_with_regex(self, content: str) -> List[tuple[str, str, str]]:
+        """Fallback method using regex to extract tokens"""
+        print("\nFalling back to regex extraction...")
+        tokens = []
+
+        # Pattern to match token information
+        pattern = r"([^()]+)\(([^)]+)\).*?(?:address|contract):\s*([a-zA-Z0-9]+)"
+        matches = re.finditer(pattern, content, re.IGNORECASE)
+
+        for match in matches:
+            name = match.group(1).strip()
+            symbol = match.group(2).strip()
+            address = match.group(3).strip()
+            if all([name, symbol, address]):
+                print(f"Found token with regex: {name} ({symbol}) - {address}")
+                tokens.append((symbol, name, address))
+
+        return tokens
+
+    async def verify_token_address(self, symbol: str, address: str) -> str:
+        """Verify token address using dexscreener"""
+        print(f"\nVerifying token address for {symbol}...")
+
+        # First try with the provided address
+        if address:
+            dex_address = get_information_from_dexscreener(address)
+            if dex_address:
+                print(f"Address verified by dexscreener: {dex_address}")
+                return dex_address
+            print("Address not found in dexscreener using provided address")
+
+        # Try with symbol if address verification failed
+        dex_address = get_information_from_dexscreener(symbol)
+        if dex_address:
+            print(f"Address found by dexscreener using symbol: {dex_address}")
+            return dex_address
+
+        print(f"No address found in dexscreener for {symbol}")
+        return address  # Return original address if no verification possible
 
     async def get_latest_listings(self) -> List[Dict[str, Any]]:
         """Get latest listings from Coinbase"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.listing_url) as response:
-                html = await response.text()
-                soup = BeautifulSoup(html, 'html.parser')
+        print("\nStarting Coinbase listings scan...")
 
-                announcements = []
-                # Get all blog post links
-                blog_links = soup.find_all(
-                    'a', href=lambda x: x and '/blog/' in x)
+        try:
+            article_content = await self.get_article_content(self.listing_url)
 
-                for link in blog_links:
-                    title = link.text.strip()
-                    if not ('listing' in title.lower() or 'support' in title.lower()):
-                        continue
+            if not article_content:
+                print("No article content found")
+                return []
 
-                    full_url = f"{self.base_url}{link['href']}" if not link['href'].startswith(
-                        'http') else link['href']
-                    print(f"Processing article: {title}")
+            # Extract tokens using GPT
+            tokens = await self.extract_solana_tokens_from_text(article_content)
+            print(f"\nFound {len(tokens)} potential Solana tokens")
 
-                    # Get full article content
-                    article_content = await self.get_article_content(full_url)
-                    if not article_content:
-                        print(f"Could not get content for {full_url}")
-                        continue
+            announcements = []
+            for symbol, name, address in tokens:
+                try:
+                    print(f"\nProcessing token: {name} ({symbol})")
+                    # First try with the provided address
+                    verified_address = get_information_from_dexscreener(
+                        address)
 
-                    # Extract token information
-                    tokens = await self.extract_token_info(article_content)
-
-                    for symbol, name, address in tokens:
+                    if not verified_address:
                         print(
-                            f"Found Solana token: {name} ({symbol}) - {address}")
-                        announcements.append({
-                            "type": "new_coin",
-                            "listing_type": "listing",
-                            "message": f"{name} ({symbol}) has been listed on Coinbase!",
-                            "currency": {
-                                "symbol": symbol.upper(),
-                                "name": name.title(),
-                                "address": address
-                            },
-                            "exchange": {
-                                "name": "Coinbase",
-                                "trading_pair_url": full_url
-                            },
-                            "blockchain": "Solana",
-                            "alert_condition_id": 2040394
-                        })
+                            f"Address not found on dexscreener, trying with symbol {symbol}")
+                        verified_address = get_information_from_dexscreener(
+                            symbol)
 
-                return announcements
+                    if not verified_address:
+                        print(
+                            f"Using original address for {symbol}: {address}")
+                        verified_address = address
+
+                    print(f"Final address for {symbol}: {verified_address}")
+
+                    # Create announcement with verified information
+                    announcement = {
+                        "type": "new_coin",
+                        "listing_type": "listing",
+                        "message": f"{name} ({symbol}) has been listed on Coinbase!",
+                        "currency": {
+                            "symbol": symbol.upper(),
+                            "name": name.strip(),
+                            "address": verified_address
+                        },
+                        "exchange": {
+                            "name": "Coinbase",
+                            "trading_pair_url": self.listing_url
+                        },
+                        "blockchain": "Solana",
+                        "alert_condition_id": 2040394
+                    }
+
+                    announcements.append(announcement)
+                    print(f"Announcement created for {symbol}")
+                except Exception as e:
+                    print(f"Error processing token {symbol}: {str(e)}")
+                    continue
+
+            print(f"\nTotal announcements created: {len(announcements)}")
+            return announcements
+
+        except Exception as e:
+            print(f"Error in get_latest_listings: {str(e)}")
+            return []
