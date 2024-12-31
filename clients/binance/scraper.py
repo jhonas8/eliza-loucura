@@ -157,23 +157,38 @@ class BinanceScraper(BaseScraper):
             print("\nArticle content:")
             print(content[:500] + "..." if len(content) > 500 else content)
 
+            # First find all Solana addresses using regex
+            import re
+            solana_address_pattern = r'[1-9A-HJ-NP-Za-km-z]{32,44}'
+            addresses = re.findall(solana_address_pattern, content)
+
+            print(f"\nFound {len(addresses)} potential Solana addresses:")
+            for addr in addresses:
+                print(f"- {addr}")
+
+            if not addresses:
+                print("No Solana addresses found in content")
+                return []
+
+            # Now use GPT to match addresses with token names/symbols
+            addresses_text = "\n".join([f"- {addr}" for addr in addresses])
             prompt = f"""
-            Extract token information from this Binance announcement.
-            
-            Announcement:
+            Match token names and symbols with these Solana addresses found in the announcement:
+
+            Addresses:
+            {addresses_text}
+
+            Announcement content:
             {content}
             
             Respond with token information in this format:
             TOKEN_NAME|TOKEN_SYMBOL|TOKEN_ADDRESS
             
-            Example:
-            Solana Token|SOL|So11111111111111111111111111111111111111112
-            
             Rules:
-            - Only include Solana tokens (look for mentions of SPL tokens or Solana network)
-            - Only include tokens with addresses
-            - Addresses must be exact matches from the text
-            - If no valid tokens found, respond with "none"
+            - Only include tokens where you can confidently match name/symbol to address
+            - Names and symbols must appear in the text
+            - Only use addresses from the provided list
+            - If no matches found, respond with "none"
             - Do not include any explanations
             """
 
@@ -185,16 +200,20 @@ class BinanceScraper(BaseScraper):
 
             result = response.choices[0].message.content.strip(
             ) if response.choices[0].message.content else None
-            print(f"\nGPT Token Extraction Response: {result}")
+            print(f"\nGPT Token Matching Response: {result}")
 
             tokens = []
             if result and result.lower() != "none":
                 for line in result.split('\n'):
                     if '|' in line:
                         name, symbol, address = line.strip().split('|')
-                        tokens.append(
-                            (symbol.strip(), name.strip(), address.strip()))
-                        print(f"Extracted: {name} ({symbol}) - {address}")
+                        # Verify the address matches our regex pattern
+                        if re.match(solana_address_pattern, address.strip()):
+                            tokens.append(
+                                (symbol.strip(), name.strip(), address.strip()))
+                            print(f"Matched: {name} ({symbol}) - {address}")
+                        else:
+                            print(f"Invalid Solana address format: {address}")
 
             return tokens
 
@@ -205,6 +224,7 @@ class BinanceScraper(BaseScraper):
     async def verify_solana_tokens(self, tokens: List[Tuple[str, str, str]]) -> List[Dict[str, Any]]:
         """Verify tokens on Solana chain using dextools"""
         print("\nVerifying tokens on Solana chain...")
+        print(f"Tokens: {tokens}")
 
         verified_tokens = []
         for symbol, name, address in tokens:
