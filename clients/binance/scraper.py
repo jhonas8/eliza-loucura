@@ -20,35 +20,43 @@ class BinanceScraper(BaseScraper):
         try:
             content = self.get_rendered_content(
                 self.announcements_url,
-                selector='div.bn-table-row',
-                wait_time=20
+                selector='.typography-body1-1',  # Target the announcement titles
+                wait_time=30
             )
 
             soup = BeautifulSoup(content, 'html.parser')
             articles = []
 
-            for article in soup.select('div.bn-table-row'):
+            # Look for announcement links within the cards
+            for article in soup.select('.bn-flex.flex-col.gap-1'):
                 try:
-                    title_el = article.select_one(
-                        'div.css-1wr4jig, div.bn-table-cell a')
-                    title = title_el.text.strip() if title_el else ""
-
                     link_el = article.select_one('a')
-                    link = link_el['href'] if link_el else ""
-                    if isinstance(link, list):
-                        link = link[0]
+                    if not link_el:
+                        continue
 
-                    full_url = f"{self.base_url}{link}" if link.startswith(
-                        '/') else link
-                    if not link.startswith(('http', '/')):
-                        full_url = f"{self.base_url}/{link}"
+                    title_el = link_el.select_one(
+                        '.typography-body1-1')
+                    if not title_el:
+                        continue
 
-                    if title and full_url:
+                    title = title_el.get_text().strip()
+                    link = link_el.get('href', '')
+
+                    if link and title:
+                        if isinstance(link, list):
+                            link = link[0]
+
+                        if link.startswith('/'):
+                            full_url = f"{self.base_url}{link}"
+                        else:
+                            full_url = f"{self.base_url}/{link}"
+
                         articles.append({
                             "title": title,
                             "url": full_url
                         })
                         print(f"Found article: {title}")
+
                 except Exception as e:
                     print(f"Error extracting article info: {str(e)}")
                     continue
@@ -68,8 +76,13 @@ class BinanceScraper(BaseScraper):
             return []
 
         try:
-            titles = "\n".join(
-                [f"- {article['title']}" for article in articles])
+            # Create numbered list of titles for better logging
+            titles_list = [f"{i}. {article['title']}" for i,
+                           article in enumerate(articles)]
+            titles = "\n".join(titles_list)
+
+            print("\nSending these titles to GPT for analysis:")
+            print(titles)
 
             prompt = f"""
             Analyze these Binance announcement titles and identify which ones are about new token listings.
@@ -82,7 +95,8 @@ class BinanceScraper(BaseScraper):
             
             Rules:
             - Only include definite listing announcements
-            - Exclude trading competitions, staking announcements, etc.
+            - Exclude futures listings, trading competitions, staking announcements
+            - Include Megadrop and Launchpool announcements
             - If no listings found, respond with "none"
             - Do not include any explanations
             """
@@ -95,24 +109,34 @@ class BinanceScraper(BaseScraper):
 
             result = response.choices[0].message.content.strip(
             ) if response.choices[0].message.content else None
-            print(f"GPT Response: {result}")
+            print(f"\nGPT Response: {result}")
 
             if not result or result.lower() == "none":
+                print("No listing announcements found")
                 return []
 
             try:
                 indices = [int(idx) for idx in result.split(",")]
-                filtered_articles = [articles[idx]
-                                     for idx in indices if idx < len(articles)]
+                filtered_articles = []
+
+                print("\nSelected announcements:")
+                for idx in indices:
+                    if idx < len(articles):
+                        article = articles[idx]
+                        filtered_articles.append(article)
+                        print(f"- {article['title']}")
+                        print(f"  URL: {article['url']}")
+
                 print(
-                    f"Found {len(filtered_articles)} potential listing announcements")
+                    f"\nFound {len(filtered_articles)} potential listing announcements")
                 return filtered_articles
-            except Exception as e:
+
+            except ValueError as e:
                 print(f"Error parsing GPT response: {str(e)}")
                 return []
 
         except Exception as e:
-            print(f"Error filtering announcements: {str(e)}")
+            print(f"Error in filter_listing_announcements: {str(e)}")
             return []
 
     async def extract_token_info(self, article_url: str) -> List[Tuple[str, str, str]]:
@@ -126,19 +150,20 @@ class BinanceScraper(BaseScraper):
                 wait_time=15
             )
 
-            if not content:
-                print("No article content found")
-                return []
+            print("\nArticle content:")
+            print(content[:500] + "..." if len(content) > 500 else content)
 
             prompt = f"""
-            Extract Solana token information from this Binance announcement.
-            Look for token names, symbols, and contract addresses.
+            Extract token information from this Binance announcement.
             
-            Content:
+            Announcement:
             {content}
             
-            Respond ONLY in this format for each token (one per line):
-            name|symbol|address
+            Respond with token information in this format:
+            TOKEN_NAME|TOKEN_SYMBOL|TOKEN_ADDRESS
+            
+            Example:
+            Solana Token|SOL|So11111111111111111111111111111111111111112
             
             Rules:
             - Only include Solana tokens (look for mentions of SPL tokens or Solana network)
@@ -154,23 +179,17 @@ class BinanceScraper(BaseScraper):
                 temperature=0.1
             )
 
-            result = response.choices[0].message.content.strip(
-            ) if response.choices[0].message.content else None
-            print(f"GPT Response: {result}")
-
-            if not result or result.lower() == "none":
-                return []
+            result = response.choices[0].message.content.strip()
+            print(f"\nGPT Token Extraction Response: {result}")
 
             tokens = []
-            for line in result.split('\n'):
-                if '|' in line:
-                    name, symbol, address = line.strip().split('|')
-                    name = name.strip()
-                    symbol = symbol.strip()
-                    address = address.strip()
-                    if all([name, symbol, address]):
-                        print(f"Found token: {name} ({symbol}) - {address}")
-                        tokens.append((symbol, name, address))
+            if result and result.lower() != "none":
+                for line in result.split('\n'):
+                    if '|' in line:
+                        name, symbol, address = line.strip().split('|')
+                        tokens.append(
+                            (symbol.strip(), name.strip(), address.strip()))
+                        print(f"Extracted: {name} ({symbol}) - {address}")
 
             return tokens
 
