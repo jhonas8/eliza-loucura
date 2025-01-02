@@ -27,7 +27,8 @@ async def scan_binance_listings() -> int:
             # Process new notification
             processed_notification = await handle_listing_notification(listing)
             if processed_notification:
-                await notification_client.save_notification(processed_notification)
+                await notification_client.save_notification(
+                    {**processed_notification, 'currency_address': token_address})
                 processed_count += 1
 
         except Exception as e:
