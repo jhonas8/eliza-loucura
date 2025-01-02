@@ -73,14 +73,14 @@ class BinanceScraper(BaseScraper):
             return []
 
     async def filter_listing_announcements(self, articles: List[Dict[str, str]]) -> List[Dict[str, str]]:
-        """Get the 5 most recent announcements for analysis"""
-        print("\nGetting 5 most recent announcements...")
+        """Get the most recent announcements for analysis"""
+        print("\nGetting most recent announcements...")
 
         if not articles:
             return []
 
-        # Take first 5 articles
-        filtered_articles = articles[:5]
+        # Take the lastest article as a listing announcement
+        filtered_articles = articles[:1]
 
         print("\nSelected announcements:")
         for article in filtered_articles:
