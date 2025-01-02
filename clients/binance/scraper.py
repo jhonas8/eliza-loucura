@@ -99,7 +99,16 @@ class BinanceScraper(BaseScraper):
                 wait_time=15
             )
 
-            print("\nArticle content:")
+            # Clean up the content
+            soup = BeautifulSoup(content, 'html.parser')
+
+            # Get text content and clean it up
+            content = soup.get_text(separator=' ', strip=True)
+
+            # Remove extra whitespace and normalize spaces
+            content = ' '.join(content.split())
+
+            print("\nCleaned article content:")
             print(content[:500] + "..." if len(content) > 500 else content)
 
             # Common patterns that indicate a token address
@@ -128,9 +137,14 @@ class BinanceScraper(BaseScraper):
                 token_name = match.group(1).strip()
                 address = match.group(2).strip()
 
-                # Clean token name (remove common suffixes)
+                # Clean token name
                 token_name = re.sub(
                     r'(?i)with|and|the|futures?|listing|[,\.]', '', token_name).strip()
+
+                # Remove any remaining HTML/JSON artifacts
+                token_name = re.sub(r'[\\{}\[\]"]+', '', token_name)
+                token_name = re.sub(
+                    r'node|element|tag|child|attr|style|text|color|rgb', '', token_name, flags=re.IGNORECASE)
 
                 if address and token_name:
                     print(f"Found token: {token_name} - {address}")
@@ -147,12 +161,19 @@ class BinanceScraper(BaseScraper):
                         context = content[max(
                             0, match.start() - 100):match.end() + 100]
                         name_match = re.search(
-                            r'(?:listing of|listing is for|token|coin)\s+([^\s]+)', context, re.IGNORECASE)
+                            r'(?:listing is for|listing of|token|coin)\s+([^\s]+)', context, re.IGNORECASE)
 
                         if name_match:
                             token_name = name_match.group(1).strip()
+                            # Clean token name
                             token_name = re.sub(
                                 r'(?i)with|and|the|futures?|listing|[,\.]', '', token_name).strip()
+                            # Remove any remaining HTML/JSON artifacts
+                            token_name = re.sub(
+                                r'[\\{}\[\]"]+', '', token_name)
+                            token_name = re.sub(
+                                r'node|element|tag|child|attr|style|text|color|rgb', '', token_name, flags=re.IGNORECASE)
+
                             print(
                                 f"Found token with context: {token_name} - {address}")
                             tokens.append(
