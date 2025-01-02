@@ -1,6 +1,7 @@
 from clients.binance.scraper import BinanceScraper
 from clients.firebase.notification import FirebaseNotificationClient
 from utils.handle_listing_notification import handle_listing_notification
+from utils.send_notification import send_notification
 
 
 async def scan_binance_listings() -> int:
@@ -30,6 +31,8 @@ async def scan_binance_listings() -> int:
                 await notification_client.save_notification(
                     {**processed_notification, 'currency_address': token_address})
                 processed_count += 1
+
+                await send_notification({**processed_notification, 'currency_address': token_address})
 
         except Exception as e:
             print(f"Error processing listing: {str(e)}")

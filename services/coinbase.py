@@ -42,7 +42,7 @@ async def scan_coinbase_listings() -> int:
                         f"Notification saved to Firebase: {processed_notification['currency']['symbol']}")
 
                     # Forward to webhooks
-                    await send_notification(processed_notification)
+                    await send_notification({**processed_notification, 'currency_address': token_address})
                     print(
                         f"Notification forwarded to webhooks: {processed_notification['currency']['symbol']}")
 
