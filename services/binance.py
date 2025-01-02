@@ -1,6 +1,6 @@
 from clients.binance.scraper import BinanceScraper
 from clients.firebase.notification import FirebaseNotificationClient
-from utils.handle_notification import handle_notification
+from utils.handle_listing_notification import handle_listing_notification
 
 
 async def scan_binance_listings() -> int:
@@ -25,7 +25,7 @@ async def scan_binance_listings() -> int:
                     continue
 
             # Process new notification
-            processed_notification = await handle_notification(listing)
+            processed_notification = await handle_listing_notification(listing)
             if processed_notification:
                 await notification_client.save_notification(processed_notification)
                 processed_count += 1

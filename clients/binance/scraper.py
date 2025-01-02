@@ -73,75 +73,21 @@ class BinanceScraper(BaseScraper):
             return []
 
     async def filter_listing_announcements(self, articles: List[Dict[str, str]]) -> List[Dict[str, str]]:
-        """Use GPT to identify potential listing announcements"""
-        print("\nAnalyzing announcements for potential listings...")
+        """Get the 5 most recent announcements for analysis"""
+        print("\nGetting 5 most recent announcements...")
 
         if not articles:
             return []
 
-        try:
-            # Create numbered list of titles for better logging
-            titles_list = [f"{i}. {article['title']}" for i,
-                           article in enumerate(articles)]
-            titles = "\n".join(titles_list)
+        # Take first 5 articles
+        filtered_articles = articles[:5]
 
-            print("\nSending these titles to GPT for analysis:")
-            print(titles)
+        print("\nSelected announcements:")
+        for article in filtered_articles:
+            print(f"\n- {article['title']}")
+            print(f"  URL: {article['url']}")
 
-            prompt = f"""
-            Analyze these Binance announcement titles and identify which ones are about new token listings.
-            
-            Titles:
-            {titles}
-            
-            Respond with ONLY the index numbers (0-based) of titles that are about new token listings.
-            Example response: 0,3,5
-            
-            Rules:
-            - Only include definite listing announcements
-            - Exclude futures listings, trading competitions, staking announcements
-            - Include Megadrop and Launchpool announcements
-            - If no listings found, respond with "none"
-            - Do not include any explanations
-            """
-
-            response = await self.openai.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1
-            )
-
-            result = response.choices[0].message.content.strip(
-            ) if response.choices[0].message.content else None
-            print(f"\nGPT Response: {result}")
-
-            if not result or result.lower() == "none":
-                print("No listing announcements found")
-                return []
-
-            try:
-                indices = [int(idx) for idx in result.split(",")]
-                filtered_articles = []
-
-                print("\nSelected announcements:")
-                for idx in indices:
-                    if idx < len(articles):
-                        article = articles[idx]
-                        filtered_articles.append(article)
-                        print(f"- {article['title']}")
-                        print(f"  URL: {article['url']}")
-
-                print(
-                    f"\nFound {len(filtered_articles)} potential listing announcements")
-                return filtered_articles
-
-            except ValueError as e:
-                print(f"Error parsing GPT response: {str(e)}")
-                return []
-
-        except Exception as e:
-            print(f"Error in filter_listing_announcements: {str(e)}")
-            return []
+        return filtered_articles
 
     async def extract_token_info(self, article_url: str) -> List[Tuple[str, str, str]]:
         """Extract token information from article content"""
@@ -150,7 +96,6 @@ class BinanceScraper(BaseScraper):
         try:
             content = self.get_rendered_content(
                 article_url,
-                selector='div.css-1ruscrd, article.css-1ql2hru',
                 wait_time=15
             )
 
@@ -158,108 +103,62 @@ class BinanceScraper(BaseScraper):
             print(content[:500] + "..." if len(content) > 500 else content)
 
             # Common patterns that indicate a token address
-            address_indicators = [
-                r'Contract Address',
-                r'Token Address',
-                r'Token Contract',
-                r'SPL Token',
-                r'Solana Address',
-                r'Contract:'
+            address_patterns = [
+                # Match "contract address here for verification: ADDRESS"
+                r'contract address here for verification:\s*([1-9A-HJ-NP-Za-km-z]{43,44})',
+                # Match "address: ADDRESS" pattern
+                r'address:\s*([1-9A-HJ-NP-Za-km-z]{43,44})',
+                # Match "Contract: ADDRESS" pattern
+                r'Contract:\s*([1-9A-HJ-NP-Za-km-z]{43,44})',
+                # Match standalone Solana addresses with context
+                r'([1-9A-HJ-NP-Za-km-z]{43,44})'
             ]
 
             import re
-            # More strict length
-            solana_address_pattern = r'[1-9A-HJ-NP-Za-km-z]{43,44}'
+            tokens = []
 
-            # Find paragraphs or sections that might contain token info
-            potential_sections = []
-
-            # Split content into paragraphs/sections
-            sections = re.split(r'\n\s*\n', content)
-
-            for section in sections:
-                # Check if section contains any address indicators
-                if any(re.search(indicator, section, re.IGNORECASE) for indicator in address_indicators):
-                    potential_sections.append(section)
-                    print(f"\nFound potential token section:\n{section}")
-
-            if not potential_sections:
-                print("No sections with token information found")
-                return []
-
-            addresses = []
-            for section in potential_sections:
-                # Look for addresses only in relevant sections
-                found_addresses = re.findall(solana_address_pattern, section)
-                for addr in found_addresses:
-                    # Additional validation
-                    # Exclude common confusion characters
-                    if len(addr) in [43, 44] and not re.search(r'[0OIl]', addr):
-                        addresses.append((addr, section))  # Keep the context
-
-            if not addresses:
-                print("No valid Solana addresses found")
-                return []
-
-            print(
-                f"\nFound {len(addresses)} potential Solana addresses with context:")
-            for addr, context in addresses:
-                print(f"\nAddress: {addr}")
-                print(f"Context: {context[:100]}...")
-
-            # Create a more structured prompt with context
-            addresses_with_context = "\n\n".join([
-                f"Address: {addr}\nContext: {ctx[:200]}..."
-                for addr, ctx in addresses
-            ])
-
-            prompt = f"""
-            Analyze these potential Solana token addresses and their context from the announcement:
-
-            {addresses_with_context}
-
-            Rules for matching:
-            1. Only match addresses that are explicitly identified as token/contract addresses
-            2. Look for clear token name and symbol mentions near the address
-            3. Ignore addresses that appear to be wallet addresses or other types
-            4. Only include tokens that are being listed (not just mentioned)
-            
-            Respond with token information in this format:
-            TOKEN_NAME|TOKEN_SYMBOL|TOKEN_ADDRESS
-            
-            If no clear token listings found, respond with "none"
-            Do not include any explanations
-            """
-
-            response = await self.openai.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1
+            # First try to find sections with both token name and address
+            sections = re.finditer(
+                r'(?:listing is for|listing of)\s+([^\s]+)\s+(?:with|and)?\s*(?:the)?\s*contract address[^:]*:\s*([1-9A-HJ-NP-Za-km-z]{43,44})',
+                content,
+                re.IGNORECASE
             )
 
-            result = response.choices[0].message.content.strip(
-            ) if response.choices[0].message.content else None
-            print(f"\nGPT Token Matching Response: {result}")
+            for match in sections:
+                token_name = match.group(1).strip()
+                address = match.group(2).strip()
 
-            tokens = []
-            if result and result.lower() != "none":
-                for line in result.split('\n'):
-                    if '|' in line:
-                        name, symbol, address = line.strip().split('|')
-                        # Final validation
-                        if (
-                            re.match(solana_address_pattern, address.strip()) and
-                            len(address.strip()) in [43, 44] and
-                            not re.search(r'[0OIl]', address.strip())
-                        ):
+                # Clean token name (remove common suffixes)
+                token_name = re.sub(
+                    r'(?i)with|and|the|futures?|listing|[,\.]', '', token_name).strip()
+
+                if address and token_name:
+                    print(f"Found token: {token_name} - {address}")
+                    tokens.append((token_name.upper(), token_name, address))
+
+            # If no tokens found with the first pattern, try others
+            if not tokens:
+                for pattern in address_patterns:
+                    matches = re.finditer(pattern, content, re.IGNORECASE)
+                    for match in matches:
+                        address = match.group(1).strip()
+
+                        # Try to find token name near the address
+                        context = content[max(
+                            0, match.start() - 100):match.end() + 100]
+                        name_match = re.search(
+                            r'(?:listing of|listing is for|token|coin)\s+([^\s]+)', context, re.IGNORECASE)
+
+                        if name_match:
+                            token_name = name_match.group(1).strip()
+                            token_name = re.sub(
+                                r'(?i)with|and|the|futures?|listing|[,\.]', '', token_name).strip()
+                            print(
+                                f"Found token with context: {token_name} - {address}")
                             tokens.append(
-                                (symbol.strip(), name.strip(), address.strip()))
-                            print(
-                                f"Validated token: {name} ({symbol}) - {address}")
-                        else:
-                            print(
-                                f"Invalid or suspicious address format: {address}")
+                                (token_name.upper(), token_name, address))
 
+            print(f"\nFound {len(tokens)} tokens with addresses")
             return tokens
 
         except Exception as e:
