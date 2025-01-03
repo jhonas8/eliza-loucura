@@ -72,16 +72,16 @@ async def handle_listing_notification(listing: Dict[str, Any]) -> Optional[Dict[
         # Send order based on environment
         if get_environment() == "PRODUCTION":
             print('Sending order to production')
-            # send_open_position_order_prod(
-            #     chain=chain,
-            #     token_address=token_address,
-            #     trading_decision="buy",
-            #     created_at=created_at,
-            #     model="lx1",
-            #     socials=socials,
-            #     market_cap=market_cap,
-            #     exchange=exchange
-            # )
+            send_open_position_order_prod(
+                chain=chain,
+                token_address=token_address,
+                trading_decision="buy",
+                created_at=created_at,
+                model="lx1",
+                socials=socials,
+                market_cap=market_cap,
+                exchange=exchange
+            )
         else:
             send_open_position_order_stg(
                 chain=chain,
