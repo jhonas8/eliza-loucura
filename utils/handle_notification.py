@@ -163,7 +163,7 @@ async def handle_notification(notification_data: Dict[str, Any]) -> Optional[Dic
         # Send order
 
         if get_environment() == "PRODUCTION":
-            print("Sending order to production")
+            print('Sending order to production')
             # send_open_position_order_prod(
             #     chain=chain,
             #     token_address=token_address,

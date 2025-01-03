@@ -19,6 +19,8 @@ class FirebaseNotificationClient(BaseFirebaseClient):
         }
 
         doc_ref.set(notification_data)
+        print(f"Saved notification: {notification_data}")
+
         return notification_data | {"id": doc_ref.id}
 
     async def get_notifications(self, page: int = 1, size: int = 10) -> Tuple[List[Dict[str, Any]], int]:

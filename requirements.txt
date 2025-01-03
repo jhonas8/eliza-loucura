@@ -10,4 +10,9 @@ pyTelegramBotAPI==4.11.0
 python-dotenv==1.0.1
 stripe==7.9.0
 pytz==2024.1
-requests==2.32.3 
+requests==2.32.3
+selenium==4.18.1
+webdriver-manager==4.0.1
+geckodriver-autoinstaller==0.1.0
+beautifulsoup4==4.12.3
+httpx==0.27.0 

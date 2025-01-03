@@ -8,6 +8,7 @@ async def send_notification_to_endpoint(session: aiohttp.ClientSession, url: str
     """Send notification to a single webhook endpoint"""
     try:
         async with session.post(url, json=data) as response:
+            print(f"Sending notification to {url} with data: {data}")
             if response.status >= 400:
                 print(
                     f"Failed to send notification to {url}. Status: {response.status}. Error: {response.text}")
