@@ -1,6 +1,10 @@
 {
     "name": "@elizaos/agent",
     "version": "1.0.0",
+    "scripts": {
+        "build": "echo 'No build needed for agent'",
+        "dev": "echo 'No dev needed for agent'"
+    },
     "dependencies": {
         "@elizaos/core": "^0.1.7"
     }

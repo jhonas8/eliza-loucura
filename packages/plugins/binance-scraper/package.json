@@ -3,13 +3,13 @@
     "version": "1.0.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc -w"
+    },
     "dependencies": {
         "@elizaos/core": "^0.1.7",
         "firebase": "^10.8.0",
         "puppeteer": "^22.0.0"
-    },
-    "scripts": {
-        "build": "tsc",
-        "dev": "tsc -w"
     }
 }
