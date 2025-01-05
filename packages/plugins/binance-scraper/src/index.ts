@@ -1,23 +1,11 @@
-import { Plugin, Action, IAgentRuntime, ActionExample } from "@elizaos/core";
+import { Plugin, Action } from "@elizaos/core";
 import { BinanceScraper } from "./scraper";
 import { FirebaseNotificationClient } from "./firebase";
 
 const scrapeBinanceAction: Action = {
     name: "SCRAPE_BINANCE",
     description: "Scrapes latest Binance listings and posts to Twitter",
-    similes: ["SCAN_BINANCE", "CHECK_BINANCE_LISTINGS"],
-    examples: [
-        {
-            input: "Check for new Binance listings",
-            output: "I'll scan Binance for new listings",
-        },
-        {
-            input: "Scan Binance announcements",
-            output: "I'll check Binance's announcement page for updates",
-        },
-    ] as ActionExample[],
-    validate: async () => true,
-    handler: async (runtime: IAgentRuntime) => {
+    handler: async (runtime) => {
         const scraper = new BinanceScraper();
         const firebase = new FirebaseNotificationClient();
 
