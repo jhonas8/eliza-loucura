@@ -24,3 +24,11 @@ export * from "./environment.ts";
 export * from "./cache.ts";
 export { default as knowledge } from "./knowledge.ts";
 export * from "./utils.ts";
+
+import { binanceScraper } from "../../plugins/binance-scraper/src";
+
+// Add to your plugins array
+const plugins = [
+    // ... other plugins
+    binanceScraper
+];
