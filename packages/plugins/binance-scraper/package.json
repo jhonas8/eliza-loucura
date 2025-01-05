@@ -4,7 +4,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "dependencies": {
-        "@elizaos/core": "workspace:*",
+        "@elizaos/core": "^0.1.7",
         "firebase": "^10.8.0",
         "puppeteer": "^22.0.0"
     },
