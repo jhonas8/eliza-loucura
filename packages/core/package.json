@@ -20,7 +20,7 @@
         "dist"
     ],
     "scripts": {
-        "build": "tsc --build",
+        "build": "tsc --build --verbose",
         "lint": "eslint --fix  --cache .",
         "watch": "tsc --watch",
         "dev": "tsc --watch",
