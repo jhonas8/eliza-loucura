@@ -1,7 +1,5 @@
 packages:
   - 'packages/core'
   - 'packages/plugins/*'
-  - 'client'
-  - 'web-agent'
+  - 'packages/adapters/*'
   - 'agent'
-  - 'docs'
