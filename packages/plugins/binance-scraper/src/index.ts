@@ -1,11 +1,23 @@
-import { Plugin, Action } from "@elizaos/core";
+import { Plugin, Action, IAgentRuntime } from "@elizaos/core";
 import { BinanceScraper } from "./scraper";
 import { FirebaseNotificationClient } from "./firebase";
 
 const scrapeBinanceAction: Action = {
     name: "SCRAPE_BINANCE",
     description: "Scrapes latest Binance listings and posts to Twitter",
-    handler: async (runtime) => {
+    similes: ["SCAN_BINANCE", "CHECK_BINANCE_LISTINGS"],
+    examples: [
+        {
+            input: "Check for new Binance listings",
+            output: "I'll scan Binance for new listings",
+        },
+        {
+            input: "Scan Binance announcements",
+            output: "I'll check Binance's announcement page for updates",
+        },
+    ],
+    validate: async () => true,
+    handler: async (runtime: IAgentRuntime) => {
         const scraper = new BinanceScraper();
         const firebase = new FirebaseNotificationClient();
 
@@ -22,7 +34,7 @@ const scrapeBinanceAction: Action = {
 
             if (existingNotifications.length === 0) {
                 // Generate tweet content using the agent's personality
-                const tweetContent = await runtime.generateText({
+                const tweetContent = await runtime.generate({
                     systemPrompt:
                         "You are announcing a new Binance listing. Be excited but professional.",
                     userPrompt: `Create a tweet about this new listing: ${JSON.stringify(
@@ -32,7 +44,7 @@ const scrapeBinanceAction: Action = {
                 });
 
                 // Post to Twitter
-                await runtime.triggerAction("POST_TWEET", {
+                await runtime.execute("POST_TWEET", {
                     content: `${tweetContent}\n\n${
                         listing.exchange?.trading_pair_url || ""
                     }`,
