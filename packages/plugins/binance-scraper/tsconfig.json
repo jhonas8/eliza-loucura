@@ -13,8 +13,10 @@
         "declaration": true,
         "rootDir": "./src",
         "allowImportingTsExtensions": true,
+        "emitDeclarationOnly": true,
         "strict": false,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true
     },
     "include": [
         "src/**/*"

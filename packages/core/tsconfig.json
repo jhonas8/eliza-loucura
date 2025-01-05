@@ -20,7 +20,12 @@
         "forceConsistentCasingInFileNames": true,
         "allowJs": true,
         "checkJs": false,
-        "noEmitOnError": false
+        "noEmitOnError": false,
+        "paths": {
+            "@elizaos/*": [
+                "../plugins/*"
+            ]
+        }
     },
     "include": [
         "src/**/*"

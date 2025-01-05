@@ -20,10 +20,10 @@
         "dist"
     ],
     "scripts": {
-        "build": "tsc --build --verbose",
+        "build": "tsup src/index.ts --format esm --dts && tsc --build --verbose",
         "lint": "eslint --fix  --cache .",
         "watch": "tsc --watch",
-        "dev": "tsc --watch",
+        "dev": "tsup src/index.ts --format esm --dts --watch",
         "build:docs": "cd docs && pnpm run build",
         "test": "vitest run",
         "test:coverage": "vitest run --coverage",

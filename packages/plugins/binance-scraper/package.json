@@ -5,12 +5,15 @@
     "types": "dist/index.d.ts",
     "type": "module",
     "scripts": {
-        "build": "tsc --build --verbose",
-        "dev": "tsc -w"
+        "build": "tsup src/index.ts --format esm --dts && tsc --build --verbose",
+        "dev": "tsup src/index.ts --format esm --dts --watch"
     },
     "dependencies": {
         "@elizaos/core": "^0.1.7",
         "firebase": "^10.8.0",
         "puppeteer": "^22.0.0"
+    },
+    "devDependencies": {
+        "tsup": "^8.0.0"
     }
 }
