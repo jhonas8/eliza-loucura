@@ -19,6 +19,7 @@ export class BinanceScraperAction implements Action {
     private twitterClient: TwitterClient;
 
     constructor(private config: BinanceScraperConfig) {
+        console.log('Initializing BinanceScraperAction with config:', config);
         // Initialize Twitter client with env variables
         this.twitterClient = new TwitterClient({
             apiKey: process.env.TWITTER_API_KEY!,
@@ -30,18 +31,30 @@ export class BinanceScraperAction implements Action {
 
     async execute(): Promise<void> {
         try {
+            console.log('Starting BinanceScraperAction execution...');
             const articles = await this.getRecentAnnouncements();
-            if (!articles.length) return;
+            console.log('Found articles:', articles);
+
+            if (!articles.length) {
+                console.log('No articles found');
+                return;
+            }
 
             // Process only the most recent article if it's new
             const latestArticle = articles[0];
-            if (this.lastProcessedUrl === latestArticle.url) return;
+            console.log('Latest article:', latestArticle);
+
+            if (this.lastProcessedUrl === latestArticle.url) {
+                console.log('Article already processed:', latestArticle.url);
+                return;
+            }
 
             // Create and post tweet
             await this.createAndPostTweet(latestArticle);
 
             // Update last processed URL
             this.lastProcessedUrl = latestArticle.url;
+            console.log('Updated lastProcessedUrl to:', this.lastProcessedUrl);
         } catch (error) {
             console.error('Error in BinanceScraperAction:', error);
         }
@@ -49,15 +62,20 @@ export class BinanceScraperAction implements Action {
 
     private async getRecentAnnouncements(): Promise<Array<{ title: string; url: string }>> {
         try {
+            console.log('Fetching announcements from:', this.announcementsUrl);
             const response = await axios.get(this.announcementsUrl);
+            console.log('Got response, parsing HTML...');
+
             const $ = cheerio.load(response.data);
             const articles: Array<{ title: string; url: string }> = [];
 
-            // Select announcement links (adjust selector based on actual HTML structure)
-            $('a.text-PrimaryText').each((_, element) => {
+            // Updated selector to match Binance's structure
+            $('.css-1wr4jig').each((_, element) => {
                 const $el = $(element);
-                const title = $el.find('h3').text().trim();
+                const title = $el.find('.css-1must4f').text().trim();
                 let url = $el.attr('href') || '';
+
+                console.log('Found element:', { title, url });
 
                 if (url.startsWith('/')) {
                     url = `${this.baseUrl}${url}`;
@@ -65,10 +83,13 @@ export class BinanceScraperAction implements Action {
 
                 if (title && url) {
                     articles.push({ title, url });
+                    console.log('Added article:', { title, url });
                 }
             });
 
-            return articles.slice(0, this.config.maxPosts);
+            const result = articles.slice(0, this.config.maxPosts);
+            console.log(`Returning ${result.length} articles:`, result);
+            return result;
         } catch (error) {
             console.error('Error fetching announcements:', error);
             return [];
@@ -78,14 +99,16 @@ export class BinanceScraperAction implements Action {
     private async createAndPostTweet(article: { title: string; url: string }): Promise<void> {
         try {
             // Create tweet content using template or default format
-            const template = this.config.template || '{{title}} {{url}} #Binance #Crypto';
+            const template = this.config.template || '🚀 {{title}} \n\nRead more: {{url}} \n\n#Binance #Crypto';
             const tweetContent = template
                 .replace('{{title}}', article.title)
                 .replace('{{url}}', article.url);
 
+            console.log('Creating tweet with content:', tweetContent);
+
             // Post to Twitter
             await this.twitterClient.post(tweetContent);
-            console.log('Posted tweet:', tweetContent);
+            console.log('Successfully posted tweet:', tweetContent);
         } catch (error) {
             console.error('Error posting tweet:', error);
         }
