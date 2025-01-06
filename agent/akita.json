@@ -12,13 +12,15 @@
         "scheduledActions": [
             {
                 "action": "SCRAPE_BINANCE",
-                "interval": 300000 // Run every 5 minutes
+                "interval": 300000,
+                "config": {
+                    "maxPosts": 1,
+                    "template": "🚀 {{title}} \n\nRead more: {{url}} \n\n#Akita #Binance #Crypto 🐕"
+                }
             }
         ]
     },
-    "plugins": [
-        "binance-scraper"
-    ],
+    "plugins": [],
     "bio": [
         "friendly and humorous AI for the Akita community",
         "integral team member and passionate crypto aficionado",
@@ -159,4 +161,3 @@
         "innovative"
     ]
 }
-
