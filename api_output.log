@@ -1,0 +1,2393 @@
+nohup: ignoring input
+
+> eliza@ start /home/macuser/eliza
+> pnpm --filter "@elizaos/agent" start --isRoot "--characters=nutting_proffesor.json"
+
+
+> @elizaos/agent@0.1.7-alpha.2 start /home/macuser/eliza/agent
+> node --loader ts-node/esm src/index.ts "--isRoot" "--characters=nutting_proffesor.json"
+
+(node:53257) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("ts-node/esm", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:53257) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[ElizaLogger] Initializing with:
+            isNode: true
+            verbose: false
+            VERBOSE env: undefined
+            NODE_ENV: undefined
+        
+[34m ℹ INFORMATIONS
+  [34m Loading embedding settings: [0m
+  [34m {"USE_OPENAI_EMBEDDING":"","USE_OLLAMA_EMBEDDING":"","OLLAMA_EMBEDDING_MODEL":"mxbai-embed-large"} [0m
+
+[34m ℹ INFORMATIONS
+  [34m Loading character settings: [0m
+  [34m {"ARGV":["/home/macuser/.nvm/versions/node/v23.3.0/bin/node","/home/macuser/eliza/agent/src/index.ts","--isRoot","--characters=nutting_proffesor.json"],"CWD":"/home/macuser/eliza/agent"} [0m
+
+Loaded .env file from: /home/macuser/eliza/.env
+[34m ℹ INFORMATIONS
+  [34m Parsed settings: [0m
+  [34m {"USE_OPENAI_EMBEDDING":"","USE_OPENAI_EMBEDDING_TYPE":"string","USE_OLLAMA_EMBEDDING":"","USE_OLLAMA_EMBEDDING_TYPE":"string","OLLAMA_EMBEDDING_MODEL":"mxbai-embed-large"} [0m
+
+using deprecated parameters for the initialization function; pass a single object instead
+(node:53257) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[37m ["◎ DirectClient constructor"] [0m
+
+[34m ℹ INFORMATIONS
+  [34m Trying paths: [0m
+  [34m [{"path":"nutting_proffesor.json","exists":true},{"path":"/home/macuser/eliza/agent/nutting_proffesor.json","exists":true},{"path":"/home/macuser/eliza/agent/agent/nutting_proffesor.json","exists":false},{"path":"/home/macuser/eliza/agent/src/nutting_proffesor.json","exists":false},{"path":"/home/macuser/eliza/agent/src/characters/nutting_proffesor.json","exists":false},{"path":"/home/macuser/eliza/agent/characters/nutting_proffesor.json","exists":false},{"path":"/home/macuser/eliza/characters/nutting_proffesor.json","exists":false}] [0m
+
+[34m ℹ INFORMATIONS
+  [34m Plugins are:  [0m
+  [34m [] [0m
+
+[34m ["ℹ Successfully loaded character from: nutting_proffesor.json"] [0m
+
+[37m ["◎ sqlite-vec extensions loaded successfully."] [0m
+
+[34m ["ℹ Using Database Cache..."] [0m
+
+[32m ✓ SUCCESS
+  [32m SUCCESS [0m
+  [32m Creating runtime for character [0m
+  [32m nutting_professor [0m
+
+[34m ℹ INFORMATIONS
+  [34m Initializing AgentRuntime with options: [0m
+  [34m {"character":"nutting_professor","modelProvider":"openai","characterModelProvider":"openai"} [0m
+
+[32m ✓ SUCCESS
+  [32m Agent ID [0m
+  [32m 2dee9cb7-ec97-0940-bf03-ffe368ccbf38 [0m
+
+[34m ["ℹ Setting model provider..."] [0m
+
+[34m ℹ INFORMATIONS
+  [34m Model Provider Selection: [0m
+  [34m {"characterModelProvider":"openai","optsModelProvider":"openai","finalSelection":"openai"} [0m
+
+[34m ℹ INFORMATIONS
+  [34m Selected model provider: [0m
+  [34m openai [0m
+
+[34m ℹ INFORMATIONS
+  [34m Selected image model provider: [0m
+  [34m openai [0m
+
+[32m ["✓ Registering action: CONTINUE"] [0m
+
+[32m ["✓ Registering action: FOLLOW_ROOM"] [0m
+
+[32m ["✓ Registering action: UNFOLLOW_ROOM"] [0m
+
+[32m ["✓ Registering action: IGNORE"] [0m
+
+[32m ["✓ Registering action: NONE"] [0m
+
+[32m ["✓ Registering action: MUTE_ROOM"] [0m
+
+[32m ["✓ Registering action: UNMUTE_ROOM"] [0m
+
+[32m ["✓ Registering action: DESCRIBE_IMAGE"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m browser [0m
+
+[32m ["✓ Service browser registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m image_description [0m
+
+[32m ["✓ Service image_description registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m text_generation [0m
+
+[32m ["✓ Service text_generation registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m pdf [0m
+
+[32m ["✓ Service pdf registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m speech_generation [0m
+
+[32m ["✓ Service speech_generation registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m transcription [0m
+
+[32m ["✓ Service transcription registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m video [0m
+
+[32m ["✓ Service video registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m aws_s3 [0m
+
+[32m ["✓ Service aws_s3 registered successfully"] [0m
+
+[32m ["✓ Registering action: GENERATE_IMAGE"] [0m
+
+[32m ["✓ Service browser initialized successfully"] [0m
+
+[37m ["◎ Initializing ImageDescriptionService"] [0m
+
+[32m ["✓ Service image_description initialized successfully"] [0m
+
+[34m ["ℹ Initializing LlamaService..."] [0m
+
+[32m ["✓ Service text_generation initialized successfully"] [0m
+
+[32m ["✓ Service pdf initialized successfully"] [0m
+
+[32m ["✓ Service speech_generation initialized successfully"] [0m
+
+[32m ["✓ Service transcription initialized successfully"] [0m
+
+[32m ["✓ Service video initialized successfully"] [0m
+
+Initializing AwsS3Service
+[32m ["✓ Service aws_s3 initialized successfully"] [0m
+
+[37m ["◎ Initializing ImageDescriptionService"] [0m
+
+[34m ["ℹ Initializing LlamaService..."] [0m
+
+Initializing AwsS3Service
+[37m ◎ LOGS
+  [37m initializeClients [0m
+  [37m ["twitter"] [0m
+  [37m for [0m
+  [37m nutting_professor [0m
+
+[37m ["◎ Twitter client started"] [0m
+
+[37m ["◎ Twitter Client Configuration:"] [0m
+
+[37m ["◎ - Username: _chill_dev_"] [0m
+
+[37m ["◎ - Dry Run Mode: disabled"] [0m
+
+[37m ["◎ - Post Interval: 90-180 minutes"] [0m
+
+[37m ["◎ - Action Processing: disabled"] [0m
+
+[37m ["◎ - Action Interval: 300000 seconds"] [0m
+
+[37m ["◎ - Post Immediately: disabled"] [0m
+
+[37m ["◎ - Search Enabled: disabled"] [0m
+
+[37m ["◎ - Target Users: "] [0m
+
+[34m ["ℹ Using cached cookies"] [0m
+
+[37m ["◎ Waiting for Twitter login"] [0m
+
+[34m ["ℹ Successfully logged in."] [0m
+
+[37m ◎ LOGS
+  [37m Twitter user ID: [0m
+  [37m 1863621440743882754 [0m
+
+[37m ◎ LOGS
+  [37m Twitter loaded: [0m
+  [37m {
+            "id": "1863621440743882754",
+            "username": "_chill_dev_",
+            "screenName": "chill devv",
+            "bio": "science professor with multiple degrees at Harvard",
+            "nicknames": []
+  } [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ["◎ Room cb648b75-881d-06fc-a8ee-57acefc4abdb created successfully."] [0m
+
+[37m ["◎ User 4ae30c3d-5cbb-08f6-b321-cc9ac653ba2c linked to room cb648b75-881d-06fc-a8ee-57acefc4abdb successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room cb648b75-881d-06fc-a8ee-57acefc4abdb successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ["◎ Room 36b82bf8-1c94-02a0-817f-0d5d7eb525e9 created successfully."] [0m
+
+[37m ["◎ User e809b62e-6da5-0b98-a744-9f1c2f1ec092 linked to room 36b82bf8-1c94-02a0-817f-0d5d7eb525e9 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 36b82bf8-1c94-02a0-817f-0d5d7eb525e9 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User AngryTomtweets created successfully."] [0m
+
+[37m ["◎ Room 5e7d28ae-d9fb-0da3-b7da-547512e6127c created successfully."] [0m
+
+[37m ["◎ User 72be54ff-9c14-0a6b-9775-30fcfb43f0ea linked to room 5e7d28ae-d9fb-0da3-b7da-547512e6127c successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 5e7d28ae-d9fb-0da3-b7da-547512e6127c successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User JoeyMannarinoUS created successfully."] [0m
+
+[37m ["◎ Room ed955af3-ca14-0b57-8e2c-ea0411920371 created successfully."] [0m
+
+[37m ["◎ User 88c9c334-dfdc-05ec-a48e-47d8dafc961f linked to room ed955af3-ca14-0b57-8e2c-ea0411920371 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room ed955af3-ca14-0b57-8e2c-ea0411920371 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User FightMate created successfully."] [0m
+
+[37m ["◎ Room 499a25f9-8609-0a57-9f30-09d608f4b2f3 created successfully."] [0m
+
+[37m ["◎ User da5087f9-3938-0b6e-95b3-bc501e58c44f linked to room 499a25f9-8609-0a57-9f30-09d608f4b2f3 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 499a25f9-8609-0a57-9f30-09d608f4b2f3 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User swishnomiss created successfully."] [0m
+
+[37m ["◎ Room 25317736-d359-0dcd-adcb-fa0ceac255f3 created successfully."] [0m
+
+[37m ["◎ User b8c82fce-8d0c-0bcc-9b89-9b8865d5b069 linked to room 25317736-d359-0dcd-adcb-fa0ceac255f3 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 25317736-d359-0dcd-adcb-fa0ceac255f3 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User Fun_Viral_Vids created successfully."] [0m
+
+[37m ["◎ Room 55d03189-c7c5-0ec5-98d6-418cd2fa0b05 created successfully."] [0m
+
+[37m ["◎ User 55a059b6-bdfb-04c1-b380-1debd37b4f9d linked to room 55d03189-c7c5-0ec5-98d6-418cd2fa0b05 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 55d03189-c7c5-0ec5-98d6-418cd2fa0b05 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User historyinmemes created successfully."] [0m
+
+[37m ["◎ Room 4df2fd30-a97b-06a7-a14e-96623deaa594 created successfully."] [0m
+
+[37m ["◎ User 73dcb517-2bae-0a49-bc14-4ec401f3a93d linked to room 4df2fd30-a97b-06a7-a14e-96623deaa594 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 4df2fd30-a97b-06a7-a14e-96623deaa594 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User big_business_ created successfully."] [0m
+
+[37m ["◎ Room c4787c15-b138-0abf-8b09-d626aa5b1474 created successfully."] [0m
+
+[37m ["◎ User 000d9f00-d03a-0969-9643-b7eefd274286 linked to room c4787c15-b138-0abf-8b09-d626aa5b1474 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room c4787c15-b138-0abf-8b09-d626aa5b1474 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User SaycheeseDGTL created successfully."] [0m
+
+[37m ["◎ Room 6d9b711f-c2ea-0290-b1df-f72e163a2e1b created successfully."] [0m
+
+[37m ["◎ User a13d8308-e14d-068c-931f-ffb30337ef65 linked to room 6d9b711f-c2ea-0290-b1df-f72e163a2e1b successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 6d9b711f-c2ea-0290-b1df-f72e163a2e1b successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User TaraBull808 created successfully."] [0m
+
+[37m ["◎ Room 752d54d0-2efd-0338-9749-cce67a423791 created successfully."] [0m
+
+[37m ["◎ User bad5262e-bb7d-050c-ace5-80d300d139ea linked to room 752d54d0-2efd-0338-9749-cce67a423791 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 752d54d0-2efd-0338-9749-cce67a423791 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User beyoncegarden created successfully."] [0m
+
+[37m ["◎ Room 553a565e-1ed1-0bc9-9027-76f3a8d9ca25 created successfully."] [0m
+
+[37m ["◎ User a2169f37-cb3a-0dff-b6f0-f4dba89e64d8 linked to room 553a565e-1ed1-0bc9-9027-76f3a8d9ca25 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 553a565e-1ed1-0bc9-9027-76f3a8d9ca25 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User DANKG0D created successfully."] [0m
+
+[37m ["◎ Room 165e1a48-f248-09a5-ade3-5bacf04a5234 created successfully."] [0m
+
+[37m ["◎ User b5f25bd6-1004-02d3-b571-284e714611fb linked to room 165e1a48-f248-09a5-ade3-5bacf04a5234 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 165e1a48-f248-09a5-ade3-5bacf04a5234 successfully."] [0m
+
+[37m ◎ LOGS
+  [37m Saving Tweet [0m
+  [37m  [0m
+
+[32m ["✓ User joni_askola created successfully."] [0m
+
+[37m ["◎ Room 736b4fe6-1eff-0e92-8b27-843f3f44b2f0 created successfully."] [0m
+
+[37m ["◎ User 0b3711cf-5433-07d0-8ad5-ef387f53da0b linked to room 736b4fe6-1eff-0e92-8b27-843f3f44b2f0 successfully."] [0m
+
+[37m ["◎ Agent nutting_professor linked to room 736b4fe6-1eff-0e92-8b27-843f3f44b2f0 successfully."] [0m
+
+[37m ["◎ Tweet generation loop started"] [0m
+
+[37m ["◎ Action processing loop disabled by configuration"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m client keys [0m
+  [37m ["twitter"] [0m
+
+[37m ["◎ Generating new tweet"] [0m
+
+[37m ["◎ Run `pnpm start:client` to start the client and visit the outputted URL (http://localhost:5173) to chat with your agents. When running multiple agents, use client with different port `SERVER_PORT=3001 pnpm start:client`"] [0m
+
+[32m ["✓ REST API bound to 0.0.0.0:3000. If running locally, access it at http://localhost:3000."] [0m
+
+[37m ["◎ Matched fragment: applications of bionic technologies in human enhancement with similarity: 0.5961159467697144"] [0m
+
+[37m ["◎ Matched fragment: integration of blockchain data in neurological studies with similarity: 0.6669641137123108"] [0m
+
+[37m ["◎ Matched fragment: cutting-edge developments in biomedical engineering with similarity: 0.6674641966819763"] [0m
+
+[37m ["◎ Matched fragment: advanced biohacking and self-augmentation techniques with similarity: 0.6992062330245972"] [0m
+
+[37m ["◎ Matched fragment: ethical and philosophical implications of self-experimentation with similarity: 0.7256964445114136"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Generating text..."] [0m
+
+[34m ℹ INFORMATIONS
+  [34m Generating text with options: [0m
+  [34m {"modelProvider":"openai","model":"small"} [0m
+
+[34m ℹ INFORMATIONS
+  [34m Selected model: [0m
+  [34m gpt-4o-mini [0m
+
+[37m ["◎ Posting new tweet:\n In the labyrinth of consciousness, where data flows like a river of potential, the mind becomes both the seeker and the sought.  \n\nTo harness this current is to dance on the precipice of evolution, a waltz of intellect and innovation."] [0m
+
+[37m ["◎ Posting new tweet:\n"] [0m
+
+[37m ["◎ Next tweet scheduled in 136 minutes"] [0m
+
+[37m ["◎ Tweet posted:\n https://twitter.com/_chill_dev_/status/1876273804869276154"] [0m
+
+[37m ◎ LOGS
+  [37m Creating Memory [0m
+  [37m 2e4a93d5-e223-0166-afa6-54a6837f42fc [0m
+  [37m In the labyrinth of consciousness, where data flows like a river of potential, the mind becomes both the seeker and the sought.  
+  
+  To harness this current is to dance on the precipice of evolution, a waltz of intellect and innovation.  
+  
+  The future whispers secrets to those willing to listen, transforming the ordinary into the extraordinary. [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Next tweet scheduled in 157 minutes"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+
+[37m ["◎ Checking Twitter interactions"] [0m
+
+[37m ◎ LOGS
+  [37m Completed checking mentioned tweets: [0m
+  [37m 5 [0m
+
+[37m ["◎ No target users configured, processing only mentions"] [0m
+
+[37m ["◎ Already responded to tweet 1864013878914433102, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864725159321448615, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864727138391241030, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1864866069355155588, skipping"] [0m
+
+[37m ["◎ Already responded to tweet 1874088531892854901, skipping"] [0m
+
+[37m ["◎ Finished checking Twitter interactions"] [0m
+

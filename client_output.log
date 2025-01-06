@@ -1,0 +1,14 @@
+nohup: ignoring input
+
+> eliza@ start:client /home/macuser/eliza
+> pnpm --dir client dev "--host"
+
+
+> eliza-client@0.1.7-alpha.2 dev /home/macuser/eliza/client
+> vite "--host"
+
+
+  VITE v5.4.11  ready in 371 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://10.128.0.33:5173/

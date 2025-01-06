@@ -1,0 +1,174 @@
+nohup: ignoring input
+
+> @elizaos/agent@0.1.7-alpha.2 start /home/macuser/eliza/agent
+> node --loader ts-node/esm src/index.ts "--characters=akita.json"
+
+(node:34813) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("ts-node/esm", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34813) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[ElizaLogger] Initializing with:
+            isNode: true
+            verbose: false
+            VERBOSE env: undefined
+            NODE_ENV: undefined
+        
+[34m ℹ INFORMATIONS
+  [34m Loading embedding settings: [0m
+  [34m {"USE_OPENAI_EMBEDDING":"","USE_OLLAMA_EMBEDDING":"","OLLAMA_EMBEDDING_MODEL":"mxbai-embed-large"} [0m
+
+[34m ℹ INFORMATIONS
+  [34m Loading character settings: [0m
+  [34m {"ARGV":["/home/macuser/.nvm/versions/node/v23.3.0/bin/node","/home/macuser/eliza/agent/src/index.ts","--characters=akita.json"],"CWD":"/home/macuser/eliza/agent"} [0m
+
+Loaded .env file from: /home/macuser/eliza/.env
+[34m ℹ INFORMATIONS
+  [34m Parsed settings: [0m
+  [34m {"USE_OPENAI_EMBEDDING":"","USE_OPENAI_EMBEDDING_TYPE":"string","USE_OLLAMA_EMBEDDING":"","USE_OLLAMA_EMBEDDING_TYPE":"string","OLLAMA_EMBEDDING_MODEL":"mxbai-embed-large"} [0m
+
+using deprecated parameters for the initialization function; pass a single object instead
+(node:34813) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[37m ["◎ DirectClient constructor"] [0m
+
+[37m ["◎ sqlite-vec extensions loaded successfully."] [0m
+
+[34m ["ℹ Using Database Cache..."] [0m
+
+[32m ✓ SUCCESS
+  [32m SUCCESS [0m
+  [32m Creating runtime for character [0m
+  [32m Eliza [0m
+
+[34m ℹ INFORMATIONS
+  [34m Initializing AgentRuntime with options: [0m
+  [34m {"character":"Eliza","modelProvider":"llama_local","characterModelProvider":"llama_local"} [0m
+
+[32m ✓ SUCCESS
+  [32m Agent ID [0m
+  [32m b850bc30-45f8-0041-a00a-83df46d8555d [0m
+
+[34m ["ℹ Setting model provider..."] [0m
+
+[34m ℹ INFORMATIONS
+  [34m Model Provider Selection: [0m
+  [34m {"characterModelProvider":"llama_local","optsModelProvider":"llama_local","finalSelection":"llama_local"} [0m
+
+[34m ℹ INFORMATIONS
+  [34m Selected model provider: [0m
+  [34m llama_local [0m
+
+[34m ℹ INFORMATIONS
+  [34m Selected image model provider: [0m
+  [34m llama_local [0m
+
+[32m ["✓ Registering action: CONTINUE"] [0m
+
+[32m ["✓ Registering action: FOLLOW_ROOM"] [0m
+
+[32m ["✓ Registering action: UNFOLLOW_ROOM"] [0m
+
+[32m ["✓ Registering action: IGNORE"] [0m
+
+[32m ["✓ Registering action: NONE"] [0m
+
+[32m ["✓ Registering action: MUTE_ROOM"] [0m
+
+[32m ["✓ Registering action: UNMUTE_ROOM"] [0m
+
+[32m ["✓ Registering action: DESCRIBE_IMAGE"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m browser [0m
+
+[32m ["✓ Service browser registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m image_description [0m
+
+[32m ["✓ Service image_description registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m text_generation [0m
+
+[32m ["✓ Service text_generation registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m pdf [0m
+
+[32m ["✓ Service pdf registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m speech_generation [0m
+
+[32m ["✓ Service speech_generation registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m transcription [0m
+
+[32m ["✓ Service transcription registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m video [0m
+
+[32m ["✓ Service video registered successfully"] [0m
+
+[37m ◎ LOGS
+  [37m Registering service: [0m
+  [37m aws_s3 [0m
+
+[32m ["✓ Service aws_s3 registered successfully"] [0m
+
+[32m ["✓ Registering action: GENERATE_IMAGE"] [0m
+
+[37m ["◎ Room b850bc30-45f8-0041-a00a-83df46d8555d created successfully."] [0m
+
+[32m ["✓ User Eliza created successfully."] [0m
+
+[32m ["✓ Service browser initialized successfully"] [0m
+
+[37m ["◎ Initializing ImageDescriptionService"] [0m
+
+[32m ["✓ Service image_description initialized successfully"] [0m
+
+[34m ["ℹ Initializing LlamaService..."] [0m
+
+[32m ["✓ Service text_generation initialized successfully"] [0m
+
+[32m ["✓ Service pdf initialized successfully"] [0m
+
+[32m ["✓ Service speech_generation initialized successfully"] [0m
+
+[32m ["✓ Service transcription initialized successfully"] [0m
+
+[32m ["✓ Service video initialized successfully"] [0m
+
+Initializing AwsS3Service
+[32m ["✓ Service aws_s3 initialized successfully"] [0m
+
+[37m ["◎ Initializing ImageDescriptionService"] [0m
+
+[34m ["ℹ Initializing LlamaService..."] [0m
+
+Initializing AwsS3Service
+[37m ◎ LOGS
+  [37m initializeClients [0m
+  [37m [] [0m
+  [37m for [0m
+  [37m Eliza [0m
+
+[37m ◎ LOGS
+  [37m client keys [0m
+  [37m [] [0m
+
+[37m ["◎ Run `pnpm start:client` to start the client and visit the outputted URL (http://localhost:5173) to chat with your agents. When running multiple agents, use client with different port `SERVER_PORT=3001 pnpm start:client`"] [0m
+
+[32m ["✓ REST API bound to 0.0.0.0:3000. If running locally, access it at http://localhost:3000."] [0m
+
