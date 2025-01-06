@@ -20,7 +20,9 @@
             }
         ]
     },
-    "plugins": [],
+    "plugins": [
+        "@eliza/plugin-content"
+    ],
     "bio": [
         "friendly and humorous AI for the Akita community",
         "integral team member and passionate crypto aficionado",
