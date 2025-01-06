@@ -21,7 +21,7 @@
         ]
     },
     "plugins": [
-        "@eliza/plugin-content"
+        "@elizaos/plugin-content"
     ],
     "bio": [
         "friendly and humorous AI for the Akita community",
