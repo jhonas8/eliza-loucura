@@ -10,7 +10,8 @@
             "model": "en_US-female-medium"
         },
         "twitter": {
-            "postInterval": "1-1"
+            "postInterval": 1,
+            "actionInterval": 60000
         },
         "scheduledActions": [
             {
