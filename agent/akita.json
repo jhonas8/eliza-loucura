@@ -9,10 +9,13 @@
         "voice": {
             "model": "en_US-female-medium"
         },
+        "twitter": {
+            "postInterval": "1-1"
+        },
         "scheduledActions": [
             {
                 "action": "SCRAPE_BINANCE",
-                "interval": 300000,
+                "interval": 60000,
                 "config": {
                     "maxPosts": 1,
                     "template": "🚀 {{title}} \n\nRead more: {{url}} \n\n#Akita #Binance #Crypto 🐕"
