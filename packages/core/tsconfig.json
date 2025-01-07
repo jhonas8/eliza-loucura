@@ -2,38 +2,25 @@
     "compilerOptions": {
         "target": "ESNext",
         "module": "ESNext",
-        "lib": [
-            "ESNext",
-            "dom"
-        ],
-        "moduleResolution": "Bundler",
+        "moduleResolution": "bundler",
         "outDir": "./dist",
         "rootDir": "./src",
-        "strict": false,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": false,
         "allowImportingTsExtensions": true,
         "declaration": true,
         "emitDeclarationOnly": true,
         "resolveJsonModule": true,
-        "noImplicitAny": false,
-        "allowJs": true,
-        "checkJs": false,
-        "noEmitOnError": false,
-        "moduleDetection": "force",
-        "allowArbitraryExtensions": true,
-        "customConditions": [
-            "@elizaos/source"
-        ],
+        "composite": true,
+        "declarationMap": true,
+        "baseUrl": "."
     },
     "include": [
         "src/**/*"
     ],
     "exclude": [
         "node_modules",
-        "dist",
-        "src/**/*.d.ts",
-        "types/**/*.test.ts"
+        "dist"
     ]
 }
+
