@@ -9,8 +9,7 @@
         "@elizaos/client-twitter": "workspace:*",
         "axios": "^1.6.2",
         "cheerio": "^1.0.0-rc.12",
-        "dotenv": "^16.3.1",
-        "tsup": "8.3.5"
+        "dotenv": "^16.3.1"
     },
     "devDependencies": {
         "@types/node": "^20.10.0",
@@ -18,8 +17,8 @@
         "typescript": "^5.3.0"
     },
     "scripts": {
-        "build": "tsup src/index.ts --format esm --dts",
-        "dev": "tsup src/index.ts --format esm --dts --watch",
+        "build": "tsc",
+        "dev": "tsc --watch",
         "test": "vitest run"
     }
 }

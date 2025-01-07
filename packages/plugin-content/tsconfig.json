@@ -8,18 +8,9 @@
         "lib": [
             "ESNext"
         ],
-        "moduleResolution": "bundler",
+        "moduleResolution": "node",
         "esModuleInterop": true,
-        "skipLibCheck": true,
-        "baseUrl": ".",
-        "paths": {
-            "@elizaos/core": [
-                "../../packages/core/src"
-            ],
-            "@elizaos/client-twitter": [
-                "../../packages/client-twitter/src"
-            ]
-        }
+        "skipLibCheck": true
     },
     "include": [
         "src/**/*"
@@ -27,13 +18,5 @@
     "exclude": [
         "node_modules",
         "dist"
-    ],
-    "references": [
-        {
-            "path": "../../packages/core"
-        },
-        {
-            "path": "../../packages/client-twitter"
-        }
     ]
 }
