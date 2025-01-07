@@ -7,9 +7,19 @@
             "./node_modules/@types",
             "./src/types"
         ],
-        "declaration": true
+        "declaration": true,
+        "composite": true
     },
     "include": [
-        "src"
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.js",
+        "src/**/*.jsx",
+        "src/**/*.json"
+    ],
+    "references": [
+        {
+            "path": "../core"
+        }
     ]
 }

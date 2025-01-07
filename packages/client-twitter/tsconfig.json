@@ -1,18 +1,32 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "outDir": "dist",
         "rootDir": "src",
-        "composite": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "allowImportingTsExtensions": true,
         "declaration": true,
+        "emitDeclarationOnly": true,
+        "resolveJsonModule": true,
+        "composite": true,
+        "declarationMap": true,
+        "baseUrl": ".",
         "paths": {
             "@elizaos/core": [
-                "../core/src/index.ts"
+                "../core/src"
             ]
         }
     },
     "include": [
-        "src/**/*.ts"
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
     ],
     "references": [
         {

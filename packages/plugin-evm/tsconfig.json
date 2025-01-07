@@ -7,9 +7,25 @@
             "./node_modules/@types",
             "./src/types"
         ],
-        "declaration": true
+        "declaration": true,
+        "composite": true
     },
     "include": [
-        "src"
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.js",
+        "src/**/*.jsx",
+        "src/**/*.json"
+    ],
+    "files": [
+        "src/index.ts",
+        "src/actions/bridge.ts",
+        "src/actions/swap.ts",
+        "src/actions/transfer.ts"
+    ],
+    "references": [
+        {
+            "path": "../core"
+        }
     ]
 }
