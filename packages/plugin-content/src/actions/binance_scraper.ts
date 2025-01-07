@@ -2,6 +2,9 @@ import { Action, IAgentRuntime } from "@elizaos/core";
 import axios from "axios";
 import * as cheerio from "cheerio";
 import TwitterClient from "@elizaos/client-twitter";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 interface BinanceScraperConfig {
     maxPosts: number;
@@ -26,81 +29,91 @@ export class BinanceScraperAction implements Action {
             },
         ],
     ];
-    handler = this.execute.bind(this);
 
-    private lastProcessedArticle: string | null = null;
     private twitterClient: any;
+    private lastProcessedArticle: string | null = null;
 
     constructor(
         private config: BinanceScraperConfig,
         private runtime: IAgentRuntime
     ) {
+        console.log(
+            "BinanceScraperAction constructor called with config:",
+            config
+        );
         this.initTwitterClient();
     }
 
     private async initTwitterClient() {
+        console.log("Initializing Twitter client...");
         this.twitterClient = await TwitterClient.start(this.runtime);
+        console.log("Twitter client initialized");
     }
 
+    handler = this.execute.bind(this);
+
     async validate(): Promise<boolean> {
-        console.log("Validating BinanceScraperAction configuration...");
+        console.log("Validating BinanceScraperAction config...");
+        if (!this.config.maxPosts || !this.config.template) {
+            console.error("Invalid config: missing required fields");
+            return false;
+        }
+        if (
+            !process.env.TWITTER_API_KEY ||
+            !process.env.TWITTER_API_SECRET ||
+            !process.env.TWITTER_ACCESS_TOKEN ||
+            !process.env.TWITTER_ACCESS_TOKEN_SECRET
+        ) {
+            console.error(
+                "Missing Twitter API credentials in environment variables"
+            );
+            return false;
+        }
         return true;
     }
 
     async execute(): Promise<void> {
-        console.log("Starting BinanceScraperAction execution...");
+        console.log("Executing BinanceScraperAction...");
         try {
             const articles = await this.getRecentAnnouncements();
-            console.log(`Found ${articles.length} articles on the page`);
+            console.log(`Found ${articles.length} articles`);
 
             if (articles.length > 0) {
                 const latestArticle = articles[0];
-                console.log("Latest article found:", {
-                    title: latestArticle.title,
-                    url: latestArticle.url,
-                });
+                console.log("Latest article:", latestArticle);
 
                 if (latestArticle.url !== this.lastProcessedArticle) {
-                    console.log("New article detected, fetching content...");
-                    const content = await this.getArticleContent(
-                        latestArticle.url
-                    );
-                    console.log(
-                        "Article content preview:",
-                        content.substring(0, 200) + "..."
-                    );
-
+                    console.log("New article found, creating tweet...");
                     await this.createAndPostTweet(latestArticle);
                     this.lastProcessedArticle = latestArticle.url;
-                    console.log(
-                        "Tweet posted successfully for article:",
-                        latestArticle.title
-                    );
                 } else {
-                    console.log(
-                        "Article already processed:",
-                        latestArticle.title
-                    );
+                    console.log("No new articles to process");
                 }
             }
         } catch (error) {
-            console.error("Error in BinanceScraperAction:", error);
+            console.error("Error executing BinanceScraperAction:", error);
             throw error;
         }
     }
 
-    private async getRecentAnnouncements() {
-        console.log("Fetching announcements from Binance...");
+    private async getRecentAnnouncements(): Promise<
+        Array<{ title: string; url: string }>
+    > {
+        console.log("Fetching recent announcements from Binance...");
         const response = await axios.get(
             "https://www.binance.com/en/support/announcement/new-cryptocurrency-listing"
         );
         const $ = cheerio.load(response.data);
         const articles: Array<{ title: string; url: string }> = [];
 
+        console.log("Parsing announcement page...");
         $(".css-1wr4jig").each((_, element) => {
             const $el = $(element);
-            const title = $el.find(".css-1must4f").text().trim();
-            const url = $el.attr("href");
+            const titleElement = $el.find(".css-1must4f");
+            const linkElement = $el.find("a");
+
+            const title = titleElement.text().trim();
+            const url = linkElement.attr("href");
 
             if (title && url) {
                 console.log("Found article:", { title, url });
@@ -108,23 +121,20 @@ export class BinanceScraperAction implements Action {
             }
         });
 
-        return articles;
+        return articles.slice(0, this.config.maxPosts);
     }
 
-    private async getArticleContent(url: string): Promise<string> {
-        console.log("Fetching article content from:", url);
-        const response = await axios.get(url);
-        const $ = cheerio.load(response.data);
-        const content = $(".css-3fpgoh").text().trim();
-        return content;
-    }
-
-    private async createAndPostTweet(article: { title: string; url: string }) {
-        const tweetContent = this.config.template
+    private async createAndPostTweet(article: {
+        title: string;
+        url: string;
+    }): Promise<void> {
+        console.log("Creating tweet for article:", article);
+        const tweet = this.config.template
             .replace("{{title}}", article.title)
             .replace("{{url}}", article.url);
 
-        console.log("Preparing to post tweet:", tweetContent);
-        await this.twitterClient.post.post(tweetContent);
+        console.log("Posting tweet:", tweet);
+        await this.twitterClient.post.post(tweet);
+        console.log("Tweet posted successfully");
     }
 }
