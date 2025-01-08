@@ -17,6 +17,14 @@ import {
 } from "agent-twitter-client";
 import { EventEmitter } from "events";
 import { TwitterConfig } from "./environment.ts";
+import { Page } from "puppeteer";
+
+// Extend the Scraper type to include the page property
+declare module "agent-twitter-client" {
+    interface Scraper {
+        page?: Page;
+    }
+}
 
 export function extractAnswer(text: string): string {
     const startIndex = text.indexOf("Answer: ") + 8;
@@ -136,7 +144,7 @@ export class ClientBase extends EventEmitter {
         );
     }
 
-    constructor(runtime: IAgentRuntime, twitterConfig:TwitterConfig) {
+    constructor(runtime: IAgentRuntime, twitterConfig: TwitterConfig) {
         super();
         this.runtime = runtime;
         this.twitterConfig = twitterConfig;
@@ -155,11 +163,76 @@ export class ClientBase extends EventEmitter {
             this.runtime.character.style.post.join();
     }
 
+    private async simulateHumanBehavior() {
+        try {
+            // Random delay before starting (1-3 seconds)
+            await new Promise((resolve) =>
+                setTimeout(resolve, 1000 + Math.random() * 2000)
+            );
+
+            // Set a realistic viewport size
+            await this.twitterClient.page?.setViewport({
+                width: 1366 + Math.floor(Math.random() * 100),
+                height: 768 + Math.floor(Math.random() * 50),
+                deviceScaleFactor: 1,
+                hasTouch: false,
+                isLandscape: true,
+                isMobile: false,
+            });
+
+            // Add some random mouse movements
+            if (this.twitterClient.page) {
+                const page = this.twitterClient.page;
+                // Move mouse randomly a few times
+                for (let i = 0; i < 3; i++) {
+                    const x = 100 + Math.floor(Math.random() * 800);
+                    const y = 100 + Math.floor(Math.random() * 400);
+                    await page.mouse.move(x, y, { steps: 10 });
+                    await new Promise((resolve) =>
+                        setTimeout(resolve, 500 + Math.random() * 1000)
+                    );
+                }
+            }
+        } catch (error) {
+            elizaLogger.warn("Error in human behavior simulation:", error);
+            // Don't throw - we want to continue even if simulation fails
+        }
+    }
+
+    private async typeHumanLike(selector: string, text: string) {
+        const page = this.twitterClient.page;
+        if (!page) return;
+
+        try {
+            await page.waitForSelector(selector);
+            await page.click(selector);
+
+            // Clear the field first
+            await page.click(selector, { clickCount: 3 }); // Triple click to select all
+            await page.keyboard.press("Backspace");
+
+            // Type with random delays between keystrokes
+            for (const char of text) {
+                await page.keyboard.type(char, {
+                    delay: 50 + Math.random() * 150, // Random delay between 50-200ms
+                });
+            }
+
+            // Random delay after typing (0.5-1.5 seconds)
+            await new Promise((resolve) =>
+                setTimeout(resolve, 500 + Math.random() * 1000)
+            );
+        } catch (error) {
+            elizaLogger.error(`Error typing into ${selector}:`, error);
+            throw error;
+        }
+    }
+
     async init() {
         const username = this.twitterConfig.TWITTER_USERNAME;
         const password = this.twitterConfig.TWITTER_PASSWORD;
         const email = this.twitterConfig.TWITTER_EMAIL;
-        let retries = this.twitterConfig.TWITTER_RETRY_LIMIT
+        let retries = this.twitterConfig.TWITTER_RETRY_LIMIT;
         const twitter2faSecret = this.twitterConfig.TWITTER_2FA_SECRET;
 
         if (!username) {
@@ -176,24 +249,61 @@ export class ClientBase extends EventEmitter {
         elizaLogger.log("Waiting for Twitter login");
         while (retries > 0) {
             try {
-                if (await this.twitterClient.isLoggedIn()) { // cookies are valid, no login required
+                if (await this.twitterClient.isLoggedIn()) {
                     elizaLogger.info("Successfully logged in.");
                     break;
                 } else {
-                    await this.twitterClient.login(
-                        username,
-                        password,
-                        email,
-                        twitter2faSecret
-                    );
-                    if (await this.twitterClient.isLoggedIn()) {  // fresh login, store new cookies
-                        elizaLogger.info("Successfully logged in.");
-                        elizaLogger.info("Caching cookies");
-                        await this.cacheCookies(
-                            username,
-                            await this.twitterClient.getCookies()
+                    // Simulate human behavior before login
+                    await this.simulateHumanBehavior();
+
+                    // Manual login process with human-like behavior
+                    const page = this.twitterClient.page;
+                    if (page) {
+                        // Navigate to login page with random timing
+                        await page.goto("https://twitter.com/login", {
+                            waitUntil: "networkidle0",
+                            timeout: 30000,
+                        });
+
+                        // Type username/email with human-like timing
+                        await this.typeHumanLike(
+                            'input[autocomplete="username"]',
+                            username
                         );
-                        break;
+                        await page.keyboard.press("Enter");
+                        await new Promise((resolve) =>
+                            setTimeout(resolve, 1000 + Math.random() * 1000)
+                        );
+
+                        // Type password with human-like timing
+                        await this.typeHumanLike(
+                            'input[name="password"]',
+                            password
+                        );
+                        await page.keyboard.press("Enter");
+
+                        // Wait for navigation and check login status
+                        await page.waitForNavigation({
+                            waitUntil: "networkidle0",
+                        });
+
+                        if (await this.twitterClient.isLoggedIn()) {
+                            elizaLogger.info("Successfully logged in.");
+                            elizaLogger.info("Caching cookies");
+                            await this.cacheCookies(
+                                username,
+                                await this.twitterClient.getCookies()
+                            );
+                            break;
+                        }
+                    } else {
+                        // Fallback to automatic login if page object is not available
+                        await this.twitterClient.login(
+                            username,
+                            password,
+                            email,
+                            twitter2faSecret
+                        );
                     }
                 }
             } catch (error) {
@@ -212,8 +322,11 @@ export class ClientBase extends EventEmitter {
                 throw new Error("Twitter login failed after maximum retries.");
             }
 
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            // Random delay between retries (2-5 seconds)
+            const delay = 2000 + Math.floor(Math.random() * 3000);
+            await new Promise((resolve) => setTimeout(resolve, delay));
         }
+
         // Initialize Twitter profile
         this.profile = await this.fetchProfile(username);
 
@@ -251,7 +364,10 @@ export class ClientBase extends EventEmitter {
     /**
      * Fetch timeline for twitter account, optionally only from followed accounts
      */
-    async fetchHomeTimeline(count: number, following?: boolean): Promise<Tweet[]> {
+    async fetchHomeTimeline(
+        count: number,
+        following?: boolean
+    ): Promise<Tweet[]> {
         elizaLogger.debug("fetching home timeline");
         const homeTimeline = following
             ? await this.twitterClient.fetchFollowingTimeline(count, [])
@@ -288,13 +404,14 @@ export class ClientBase extends EventEmitter {
                     hashtags: tweet.hashtags ?? tweet.legacy?.entities.hashtags,
                     mentions:
                         tweet.mentions ?? tweet.legacy?.entities.user_mentions,
-                    photos: tweet.legacy?.entities?.media?.filter(
-                            (media) => media.type === "photo"
-                        ).map(media => ({
-                            id: media.id_str,
-                            url: media.media_url_https,  // Store media_url_https as url
-                            alt_text: media.alt_text
-                        })) || [],
+                    photos:
+                        tweet.legacy?.entities?.media
+                            ?.filter((media) => media.type === "photo")
+                            .map((media) => ({
+                                id: media.id_str,
+                                url: media.media_url_https, // Store media_url_https as url
+                                alt_text: media.alt_text,
+                            })) || [],
                     thread: tweet.thread || [],
                     urls: tweet.urls ?? tweet.legacy?.entities.urls,
                     videos:
@@ -314,38 +431,41 @@ export class ClientBase extends EventEmitter {
     async fetchTimelineForActions(count: number): Promise<Tweet[]> {
         elizaLogger.debug("fetching timeline for actions");
 
-        const agentUsername = this.twitterConfig.TWITTER_USERNAME
+        const agentUsername = this.twitterConfig.TWITTER_USERNAME;
         const homeTimeline = await this.twitterClient.fetchHomeTimeline(
             count,
             []
         );
 
-        return homeTimeline.map((tweet) => ({
-            id: tweet.rest_id,
-            name: tweet.core?.user_results?.result?.legacy?.name,
-            username: tweet.core?.user_results?.result?.legacy?.screen_name,
-            text: tweet.legacy?.full_text,
-            inReplyToStatusId: tweet.legacy?.in_reply_to_status_id_str,
-            timestamp: new Date(tweet.legacy?.created_at).getTime() / 1000,
-            userId: tweet.legacy?.user_id_str,
-            conversationId: tweet.legacy?.conversation_id_str,
-            permanentUrl: `https://twitter.com/${tweet.core?.user_results?.result?.legacy?.screen_name}/status/${tweet.rest_id}`,
-            hashtags: tweet.legacy?.entities?.hashtags || [],
-            mentions: tweet.legacy?.entities?.user_mentions || [],
-            photos: tweet.legacy?.entities?.media?.filter(
-                (media) => media.type === "photo"
-            ).map(media => ({
-                id: media.id_str,
-                url: media.media_url_https,  // Store media_url_https as url
-                alt_text: media.alt_text
-                 })) || [],
-            thread: tweet.thread || [],
-            urls: tweet.legacy?.entities?.urls || [],
-            videos:
-                tweet.legacy?.entities?.media?.filter(
-                    (media) => media.type === "video"
-                ) || [],
-        })).filter(tweet => tweet.username !== agentUsername); // do not perform action on self-tweets
+        return homeTimeline
+            .map((tweet) => ({
+                id: tweet.rest_id,
+                name: tweet.core?.user_results?.result?.legacy?.name,
+                username: tweet.core?.user_results?.result?.legacy?.screen_name,
+                text: tweet.legacy?.full_text,
+                inReplyToStatusId: tweet.legacy?.in_reply_to_status_id_str,
+                timestamp: new Date(tweet.legacy?.created_at).getTime() / 1000,
+                userId: tweet.legacy?.user_id_str,
+                conversationId: tweet.legacy?.conversation_id_str,
+                permanentUrl: `https://twitter.com/${tweet.core?.user_results?.result?.legacy?.screen_name}/status/${tweet.rest_id}`,
+                hashtags: tweet.legacy?.entities?.hashtags || [],
+                mentions: tweet.legacy?.entities?.user_mentions || [],
+                photos:
+                    tweet.legacy?.entities?.media
+                        ?.filter((media) => media.type === "photo")
+                        .map((media) => ({
+                            id: media.id_str,
+                            url: media.media_url_https, // Store media_url_https as url
+                            alt_text: media.alt_text,
+                        })) || [],
+                thread: tweet.thread || [],
+                urls: tweet.legacy?.entities?.urls || [],
+                videos:
+                    tweet.legacy?.entities?.media?.filter(
+                        (media) => media.type === "video"
+                    ) || [],
+            }))
+            .filter((tweet) => tweet.username !== agentUsername); // do not perform action on self-tweets
     }
 
     async fetchSearchTweets(
