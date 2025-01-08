@@ -86,7 +86,7 @@ Write only the tweet text:`;
             if (this.client.twitterConfig.TWITTER_DRY_RUN) {
                 elizaLogger.info("Dry run mode - would tweet:", tweetText);
             } else {
-                await this.client.twitterClient.postTweet(tweetText);
+                await this.client.twitterClient.sendTweet(tweetText);
                 elizaLogger.info(
                     "Successfully tweeted about new Binance article"
                 );
@@ -134,7 +134,7 @@ Write only the tweet text:`;
             if (this.client.twitterConfig.TWITTER_DRY_RUN) {
                 elizaLogger.info("Dry run mode - would tweet:", response);
             } else {
-                await this.client.twitterClient.postTweet(response);
+                await this.client.twitterClient.sendTweet(response);
                 elizaLogger.info("Posted new tweet:", response);
             }
         } catch (error) {
