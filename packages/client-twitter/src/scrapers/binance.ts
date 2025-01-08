@@ -17,10 +17,40 @@ export class BinanceScraper {
         try {
             const browser = await puppeteer.launch({
                 headless: "new",
-                args: ["--no-sandbox", "--disable-setuid-sandbox"],
+                args: [
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--no-first-run",
+                    "--no-zygote",
+                    "--single-process",
+                ],
+                ignoreDefaultArgs: ["--enable-automation"],
+                env: {
+                    ...process.env,
+                    DISPLAY: undefined,
+                    XAUTHORITY: undefined,
+                },
             });
+
             this.page = await browser.newPage();
             await this.page.setViewport({ width: 1366, height: 768 });
+
+            // Disable unnecessary features that might cause issues
+            await this.page.setRequestInterception(true);
+            this.page.on("request", (request) => {
+                const resourceType = request.resourceType();
+                if (
+                    resourceType === "image" ||
+                    resourceType === "font" ||
+                    resourceType === "media"
+                ) {
+                    request.abort();
+                } else {
+                    request.continue();
+                }
+            });
         } catch (error) {
             elizaLogger.error("Error initializing BinanceScraper:", error);
             throw error;
