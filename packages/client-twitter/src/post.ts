@@ -43,42 +43,50 @@ export class TwitterPostClient {
         const generateTweet = async (
             requestShorter: boolean = false
         ): Promise<string> => {
-            const prompt = `You are a crypto expert and enthusiast. Write an engaging tweet about this Binance news article:
+            const prompt = `You are ${this.runtime.character.name}, ${this.runtime.character.bio.join(", ")}.
+Your personality traits: ${this.runtime.character.adjectives.join(", ")}.
+Your style: ${this.runtime.character.style.all.join(", ")}.
+Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
+
+Write an engaging tweet about this Binance news article:
+
 Title: ${article.title}
 Content: ${article.content.substring(0, 500)}...
 
+Example tweets from you:
+${this.runtime.character.postExamples.join("\n")}
+
 The tweet should:
 1. Be informative but concise
-2. Include key points from the article
+2. Include the most important points from the article
 3. Use appropriate crypto terminology
 4. Be engaging and professional
-5. Leave room for the URL at the end
-6. Not exceed ${requestShorter ? "200" : "240"} characters (excluding URL)${requestShorter ? "\n7. Make it shorter than the previous attempt" : ""}
+5. Not exceed ${requestShorter ? "200" : "280"} characters
+6. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
+7. Add relevant hashtags (max 2)
+8. Maintain your unique personality traits and style${requestShorter ? "\n9. Make it shorter than the previous attempt" : ""}
 
 Write only the tweet text:`;
 
-            const response = await textGenService.queueTextCompletion(
+            return await textGenService.queueTextCompletion(
                 prompt,
                 0.7,
                 [],
                 0,
                 0,
-                240
+                280
             );
-
-            return response.trim();
         };
 
         let tweetText = await generateTweet();
-        const urlLength = article.url.length + 1; // +1 for the space
 
-        // If tweet + URL exceeds Twitter's limit, try again with a shorter request
-        if (tweetText.length + urlLength > 280) {
+        // If tweet exceeds Twitter's limit, try again with a shorter request
+        if (tweetText.length > 280) {
             elizaLogger.info("Tweet too long, generating shorter version...");
             tweetText = await generateTweet(true);
         }
 
-        return `${tweetText} ${article.url}`;
+        return tweetText;
     }
 
     private async checkAndTweetNewArticle(): Promise<void> {
@@ -238,25 +246,28 @@ Write only the tweet text:`;
         const generateTweet = async (
             requestShorter: boolean = false
         ): Promise<string> => {
-            const prompt = `You are ${this.runtime.character.name}, a crypto expert and enthusiast.
+            const prompt = `You are ${this.runtime.character.name}, ${this.runtime.character.bio.join(", ")}.
+Your personality traits: ${this.runtime.character.adjectives.join(", ")}.
+Your style: ${this.runtime.character.style.all.join(", ")}.
+Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
+
 Write an engaging tweet about this Binance news article:
 
 Title: ${article.title}
-Content: ${article.content.substring(0, 1000)}...
+Content: ${article.content.substring(0, 500)}...
+
+Example tweets from you:
+${this.runtime.character.postExamples.join("\n")}
 
 The tweet should:
 1. Be informative but concise
 2. Include the most important points from the article
 3. Use appropriate crypto terminology
 4. Be engaging and professional
-5. Leave room for the URL at the end
-6. Not exceed ${requestShorter ? "200" : "240"} characters (excluding URL)
-7. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
-8. Add relevant hashtags (max 2)
-9. Maintain your unique personality as ${this.runtime.character.name}${requestShorter ? "\n10. Make it shorter than the previous attempt" : ""}
-
-Character's Bio: ${this.runtime.character.bio}
-Character's Style: ${this.client.directions}
+5. Not exceed ${requestShorter ? "200" : "280"} characters
+6. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
+7. Add relevant hashtags (max 2)
+8. Maintain your unique personality traits and style${requestShorter ? "\n9. Make it shorter than the previous attempt" : ""}
 
 Write only the tweet text:`;
 
@@ -266,20 +277,19 @@ Write only the tweet text:`;
                 [],
                 0,
                 0,
-                240
+                280
             );
         };
 
         let tweetText = await generateTweet();
-        const urlLength = article.url.length + 1; // +1 for the space
 
-        // If tweet + URL exceeds Twitter's limit, try again with a shorter request
-        if (tweetText.length + urlLength > 280) {
+        // If tweet exceeds Twitter's limit, try again with a shorter request
+        if (tweetText.length > 280) {
             elizaLogger.info("Tweet too long, generating shorter version...");
             tweetText = await generateTweet(true);
         }
 
-        return `${tweetText} ${article.url}`;
+        return tweetText;
     }
 
     async start() {
