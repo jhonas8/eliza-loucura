@@ -1,6 +1,6 @@
 import { elizaLogger } from "@elizaos/core";
 import * as cheerio from "cheerio";
-import axios from "axios";
+import { chromium } from "playwright";
 
 export interface BinanceArticle {
     title: string;
@@ -10,46 +10,51 @@ export interface BinanceArticle {
 }
 
 export class BinanceScraper {
-    private baseUrl = "https://www.binance.com/en/news";
-    private axiosInstance = axios.create({
-        headers: {
-            "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-            Connection: "keep-alive",
-            "Upgrade-Insecure-Requests": "1",
-            "Cache-Control": "max-age=0",
-        },
-    });
+    private baseUrl =
+        "https://www.binance.com/en/support/announcement/c-48?c=48&type=1";
 
-    private async fetchContent(url: string): Promise<string> {
+    private async getRenderedContent(
+        url: string,
+        waitTime: number = 30
+    ): Promise<string> {
+        const browser = await chromium.launch({
+            headless: true,
+        });
+
+        const context = await browser.newContext();
+        const page = await context.newPage();
+
         try {
-            const response = await this.axiosInstance.get(url);
-            return response.data;
-        } catch (error) {
-            elizaLogger.error("Error fetching content:", error);
-            throw error;
+            await page.goto(url, { timeout: waitTime * 1000 });
+            await page.waitForLoadState("networkidle");
+            const content = await page.content();
+            return content;
+        } finally {
+            await browser.close();
         }
     }
 
     async getLatestArticle(): Promise<BinanceArticle | null> {
         try {
             elizaLogger.info("Fetching latest Binance article...");
-            const html = await this.fetchContent(this.baseUrl);
+            const html = await this.getRenderedContent(this.baseUrl);
             const $ = cheerio.load(html);
 
-            // Get the first article
-            const firstArticle = $(".css-1wr4jig").first();
-            if (!firstArticle.length) {
-                elizaLogger.warn("No articles found on Binance news page");
+            // Find the first article
+            const firstArticleLink = $(
+                "a.text-PrimaryText.hover\\:text-PrimaryYellow"
+            ).first();
+            if (!firstArticleLink.length) {
+                elizaLogger.warn(
+                    "No articles found on Binance announcements page"
+                );
                 return null;
             }
 
-            const title = firstArticle.find("h2").text().trim();
-            const url = firstArticle.find("a").attr("href");
+            const title = firstArticleLink.find("h3").text().trim();
+            const url = firstArticleLink.attr("href");
             const dateText =
-                firstArticle.find("time").attr("datetime") ||
+                firstArticleLink.find("time").attr("datetime") ||
                 new Date().toISOString();
 
             if (!url || !title) {
@@ -57,15 +62,19 @@ export class BinanceScraper {
                 return null;
             }
 
+            const fullUrl = url.startsWith("/")
+                ? `https://www.binance.com${url}`
+                : url;
+
             // Get the full article content
-            const articleHtml = await this.fetchContent(url);
+            const articleHtml = await this.getRenderedContent(fullUrl);
             const $article = cheerio.load(articleHtml);
-            const content = $article(".css-1nfyzg8").text().trim();
+            const content = $article("body").text().replace(/\s+/g, " ").trim();
 
             return {
                 title,
                 content,
-                url,
+                url: fullUrl,
                 date: new Date(dateText),
             };
         } catch (error) {
