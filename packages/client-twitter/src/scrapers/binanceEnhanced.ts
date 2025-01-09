@@ -47,10 +47,10 @@ export class BinanceEnhancedScraper {
 
     async getLatestArticle(): Promise<BinanceArticle | null> {
         try {
-            const content = await this.getRenderedContent(
+            const pageContent = await this.getRenderedContent(
                 this.announcementsUrl
             );
-            const $ = cheerio.load(content);
+            const $ = cheerio.load(pageContent);
 
             // Find the first article
             const firstArticleLink = $(
@@ -69,8 +69,8 @@ export class BinanceEnhancedScraper {
             const fullUrl = url.startsWith("/") ? `${this.baseUrl}${url}` : url;
 
             // Get article content
-            const articleContent = await this.getRenderedContent(fullUrl);
-            const $article = cheerio.load(articleContent);
+            const articleHtml = await this.getRenderedContent(fullUrl);
+            const $article = cheerio.load(articleHtml);
             const content = $article("body").text().replace(/\s+/g, " ").trim();
 
             // Try to find the date in the article, fallback to current date if not found
