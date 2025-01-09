@@ -1,6 +1,6 @@
 import { elizaLogger } from "@elizaos/core";
 import * as cheerio from "cheerio";
-import fetch from "node-fetch";
+import axios from "axios";
 
 export interface BinanceArticle {
     title: string;
@@ -11,34 +11,24 @@ export interface BinanceArticle {
 
 export class BinanceScraper {
     private baseUrl = "https://www.binance.com/en/news";
-    private browserlessApiKey = process.env.BROWSERLESS_API_KEY;
-    private browserlessUrl = `https://chrome.browserless.io/content?token=${this.browserlessApiKey}`;
+    private axiosInstance = axios.create({
+        headers: {
+            "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            Connection: "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+            "Cache-Control": "max-age=0",
+        },
+    });
 
-    private async fetchRenderedContent(url: string): Promise<string> {
+    private async fetchContent(url: string): Promise<string> {
         try {
-            const response = await fetch(this.browserlessUrl, {
-                method: "POST",
-                headers: {
-                    "Cache-Control": "no-cache",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    url,
-                    waitFor: ".css-1wr4jig", // Wait for article container
-                    gotoOptions: {
-                        waitUntil: "networkidle0",
-                        timeout: 30000,
-                    },
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.text();
+            const response = await this.axiosInstance.get(url);
+            return response.data;
         } catch (error) {
-            elizaLogger.error("Error fetching rendered content:", error);
+            elizaLogger.error("Error fetching content:", error);
             throw error;
         }
     }
@@ -46,7 +36,7 @@ export class BinanceScraper {
     async getLatestArticle(): Promise<BinanceArticle | null> {
         try {
             elizaLogger.info("Fetching latest Binance article...");
-            const html = await this.fetchRenderedContent(this.baseUrl);
+            const html = await this.fetchContent(this.baseUrl);
             const $ = cheerio.load(html);
 
             // Get the first article
@@ -68,7 +58,7 @@ export class BinanceScraper {
             }
 
             // Get the full article content
-            const articleHtml = await this.fetchRenderedContent(url);
+            const articleHtml = await this.fetchContent(url);
             const $article = cheerio.load(articleHtml);
             const content = $article(".css-1nfyzg8").text().trim();
 
