@@ -7,6 +7,7 @@ import {
 import { ClientBase } from "./base.ts";
 import { BinanceScraper, BinanceArticle } from "./scrapers/binance.ts";
 import { BinanceEnhancedScraper } from "./scrapers/binanceEnhanced";
+import { OpenAIService } from "../../plugin-node/src/services/openai";
 
 export class TwitterPostClient {
     private lastArticleUrl: string | null = null;
@@ -14,6 +15,7 @@ export class TwitterPostClient {
     private binanceEnhancedScraper: BinanceEnhancedScraper;
     private postInterval: number;
     private postImmediately: boolean;
+    private textGenService: ITextGenerationService;
 
     constructor(
         private client: ClientBase,
@@ -28,15 +30,17 @@ export class TwitterPostClient {
                 this.client.twitterConfig.POST_INTERVAL_MIN
         );
         this.postImmediately = this.client.twitterConfig.POST_IMMEDIATELY;
+
+        // Initialize OpenAI service
+        this.textGenService = new OpenAIService();
+        this.textGenService.initialize(this.runtime);
+        this.runtime.registerService(this.textGenService);
     }
 
     private async generateTweetFromArticle(
         article: BinanceArticle
     ): Promise<string> {
-        const textGenService = this.runtime.getService<ITextGenerationService>(
-            ServiceType.TEXT_GENERATION
-        );
-        if (!textGenService) {
+        if (!this.textGenService) {
             throw new Error("Text generation service not available");
         }
 
@@ -68,7 +72,7 @@ The tweet should:
 
 Write only the tweet text:`;
 
-            const response = await textGenService.queueTextCompletion(
+            const response = await this.textGenService.queueTextCompletion(
                 prompt,
                 0.7,
                 [],
