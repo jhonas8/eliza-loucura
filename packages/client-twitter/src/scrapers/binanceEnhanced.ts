@@ -20,7 +20,7 @@ export class BinanceEnhancedScraper {
 
     private async getRenderedContent(
         url: string,
-        waitTime: number = 30
+        waitTime: number = 40
     ): Promise<string> {
         const browser = await chromium.launch({
             headless: true,
@@ -32,110 +32,95 @@ export class BinanceEnhancedScraper {
 
         try {
             elizaLogger.info(`Navigating to URL with ${waitTime}s timeout...`);
-            await page.goto(url, {
-                timeout: waitTime * 1000,
-                waitUntil: "networkidle",
-            });
+            await page.goto(url, { timeout: waitTime * 1000 });
 
-            // Wait for the main content to be visible
-            if (url.includes("/support/announcement/c-48")) {
-                // For the announcements list page
-                await page.waitForSelector("a.text-PrimaryText", {
-                    timeout: waitTime * 1000,
-                });
-            } else {
-                // For individual article pages
-                await page.waitForSelector("article, .css-1nfyzg8", {
-                    timeout: waitTime * 1000,
-                });
-            }
-
-            // Additional wait to ensure dynamic content is loaded
+            // Wait for the content to be loaded
+            await page.waitForLoadState("domcontentloaded");
             await page.waitForLoadState("networkidle");
-            await new Promise((resolve) => setTimeout(resolve, 2000)); // Extra 2s safety margin
+
+            // Additional wait for dynamic content
+            await new Promise((resolve) => setTimeout(resolve, 5000));
 
             elizaLogger.info("Page loaded successfully, getting content...");
             content = await page.content();
-
-            return content;
         } catch (error) {
             elizaLogger.error("Error during page rendering:", error);
             throw error;
         } finally {
-            try {
-                await context.close();
-                await browser.close();
-                elizaLogger.info("Browser closed");
-            } catch (error) {
-                elizaLogger.error("Error closing browser:", error);
-            }
+            await context.close();
+            await browser.close();
+            elizaLogger.info("Browser closed");
         }
+
+        return content;
     }
 
     async getLatestArticle(): Promise<BinanceArticle | null> {
         try {
             elizaLogger.info("Fetching recent Binance announcements...");
             const pageContent = await this.getRenderedContent(
-                this.announcementsUrl,
-                40 // Increased timeout for the list page
+                this.announcementsUrl
             );
             const $ = cheerio.load(pageContent);
 
-            // Find the first article
-            const firstArticleLink = $(
-                "a.text-PrimaryText.hover\\:text-PrimaryYellow"
-            ).first();
-            if (!firstArticleLink.length) {
-                elizaLogger.warn("No article links found on the page");
+            // Find all article links
+            const articles: Array<{ title: string; url: string }> = [];
+
+            $("div.css-1wr4jig")
+                .find("a")
+                .each((_, element) => {
+                    const link = $(element);
+                    const title = link.find("h3").text().trim();
+                    const url = link.attr("href");
+
+                    if (url && title) {
+                        const fullUrl = url.startsWith("/")
+                            ? `${this.baseUrl}${url}`
+                            : url;
+                        articles.push({
+                            title,
+                            url: fullUrl,
+                        });
+                        elizaLogger.info(`Found article: ${title}`);
+                    }
+                });
+
+            if (articles.length === 0) {
+                elizaLogger.warn("No articles found");
                 return null;
             }
 
-            const title = firstArticleLink.find("h3").text().trim();
-            const url = firstArticleLink.attr("href");
-            if (!url || !title) {
-                elizaLogger.warn("Missing title or URL from article link");
-                return null;
-            }
+            // Get the first (latest) article
+            const firstArticle = articles[0];
+            elizaLogger.info(
+                `Processing latest article: ${firstArticle.title}`
+            );
 
-            const fullUrl = url.startsWith("/") ? `${this.baseUrl}${url}` : url;
-            elizaLogger.info(`Found article: ${title}`);
-            elizaLogger.info(`Fetching content from: ${fullUrl}`);
-
-            // Get article content with increased timeout
-            const articleHtml = await this.getRenderedContent(fullUrl, 40);
+            // Get article content
+            const articleHtml = await this.getRenderedContent(firstArticle.url);
             const $article = cheerio.load(articleHtml);
 
-            // Try different selectors for content
-            const contentSelectors = [
-                "article",
-                ".css-1nfyzg8",
-                ".announcement-content",
-            ];
+            // Get article content
             let content = "";
-
-            for (const selector of contentSelectors) {
-                const element = $article(selector);
-                if (element.length) {
-                    content = element.text().replace(/\s+/g, " ").trim();
-                    break;
-                }
+            const articleContent = $article("div.css-1nfyzg8");
+            if (articleContent.length) {
+                content = articleContent.text().replace(/\s+/g, " ").trim();
+            } else {
+                // Fallback to main content area
+                content = $article("main").text().replace(/\s+/g, " ").trim();
             }
 
             if (!content) {
-                content = $article("body").text().replace(/\s+/g, " ").trim();
+                elizaLogger.warn("Could not fetch article content");
+                return null;
             }
-
-            // Try to find the date in the article, fallback to current date if not found
-            const dateText =
-                $article("time").attr("datetime") || new Date().toISOString();
-            const date = new Date(dateText);
 
             elizaLogger.info("Successfully fetched article content");
             return {
-                title,
+                title: firstArticle.title,
                 content,
-                url: fullUrl,
-                date,
+                url: firstArticle.url,
+                date: new Date(),
             };
         } catch (error) {
             elizaLogger.error("Error getting article content:", error);
