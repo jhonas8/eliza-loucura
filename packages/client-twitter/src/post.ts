@@ -108,12 +108,14 @@ export class TwitterPostClient {
     private lastProcessTime: number = 0;
     private stopProcessingActions: boolean = false;
     private isDryRun: boolean;
+    private binanceEnhancedScraper: BinanceEnhancedScraper;
 
     constructor(client: ClientBase, runtime: IAgentRuntime) {
         this.client = client;
         this.runtime = runtime;
         this.twitterUsername = this.client.twitterConfig.TWITTER_USERNAME;
         this.isDryRun = this.client.twitterConfig.TWITTER_DRY_RUN;
+        this.binanceEnhancedScraper = new BinanceEnhancedScraper();
 
         // Log configuration on initialization
         elizaLogger.log("Twitter Client Configuration:");
@@ -160,8 +162,9 @@ export class TwitterPostClient {
             }>("twitter/" + this.twitterUsername + "/lastPost");
 
             const lastPostTimestamp = lastPost?.timestamp ?? 0;
-            const minMinutes = this.client.twitterConfig.POST_INTERVAL_MIN;
-            const maxMinutes = this.client.twitterConfig.POST_INTERVAL_MAX;
+            // Reduced intervals for testing
+            const minMinutes = 1;
+            const maxMinutes = 2;
             const randomMinutes =
                 Math.floor(Math.random() * (maxMinutes - minMinutes + 1)) +
                 minMinutes;
@@ -172,38 +175,44 @@ export class TwitterPostClient {
             }
 
             setTimeout(() => {
-                generateNewTweetLoop(); // Set up next iteration
+                generateNewTweetLoop();
             }, delay);
 
             elizaLogger.log(`Next tweet scheduled in ${randomMinutes} minutes`);
         };
 
-        const processActionsLoop = async () => {
-            const actionInterval = this.client.twitterConfig.ACTION_INTERVAL; // Defaults to 5 minutes
+        // Start Binance article monitoring
+        const checkBinanceArticles = async () => {
+            try {
+                const article =
+                    await this.binanceEnhancedScraper.getLatestArticle();
+                if (article) {
+                    const lastProcessedArticle =
+                        await this.runtime.cacheManager.get<{
+                            url: string;
+                            timestamp: number;
+                        }>(
+                            "twitter/" +
+                                this.twitterUsername +
+                                "/lastProcessedArticle"
+                        );
 
-            while (!this.stopProcessingActions) {
-                try {
-                    const results = await this.processTweetActions();
-                    if (results) {
-                        elizaLogger.log(`Processed ${results.length} tweets`);
-                        elizaLogger.log(
-                            `Next action processing scheduled in ${actionInterval} minutes`
+                    if (
+                        !lastProcessedArticle ||
+                        lastProcessedArticle.url !== article.url
+                    ) {
+                        elizaLogger.info(
+                            "Found new Binance article, generating tweet..."
                         );
-                        // Wait for the full interval before next processing
-                        await new Promise(
-                            (resolve) =>
-                                setTimeout(resolve, actionInterval * 60 * 1000) // now in minutes
-                        );
+                        await this.generateBinanceArticleTweet();
                     }
-                } catch (error) {
-                    elizaLogger.error(
-                        "Error in action processing loop:",
-                        error
-                    );
-                    // Add exponential backoff on error
-                    await new Promise((resolve) => setTimeout(resolve, 30000)); // Wait 30s on error
                 }
+            } catch (error) {
+                elizaLogger.error("Error checking Binance articles:", error);
             }
+
+            // Check every minute
+            setTimeout(checkBinanceArticles, 60 * 1000);
         };
 
         if (this.client.twitterConfig.POST_IMMEDIATELY) {
@@ -213,7 +222,10 @@ export class TwitterPostClient {
         // Only start tweet generation loop if not in dry run mode
         if (!this.isDryRun) {
             generateNewTweetLoop();
-            elizaLogger.log("Tweet generation loop started");
+            checkBinanceArticles(); // Start Binance monitoring
+            elizaLogger.log(
+                "Tweet generation and Binance monitoring loops started"
+            );
         } else {
             elizaLogger.log("Tweet generation loop disabled (dry run mode)");
         }
@@ -245,13 +257,32 @@ export class TwitterPostClient {
         elizaLogger.log("Generating new tweet");
 
         try {
-            // Randomly choose between personality-based tweet and Binance article tweet
-            const shouldUseBinance = Math.random() < 0.5;
+            // Check for new Binance article first
+            const article =
+                await this.binanceEnhancedScraper.getLatestArticle();
+            if (article) {
+                const lastProcessedArticle =
+                    await this.runtime.cacheManager.get<{
+                        url: string;
+                        timestamp: number;
+                    }>(
+                        "twitter/" +
+                            this.twitterUsername +
+                            "/lastProcessedArticle"
+                    );
 
-            if (shouldUseBinance) {
-                return await this.generateBinanceArticleTweet();
+                if (
+                    !lastProcessedArticle ||
+                    lastProcessedArticle.url !== article.url
+                ) {
+                    elizaLogger.info(
+                        "Found new Binance article, generating article tweet..."
+                    );
+                    await this.generateBinanceArticleTweet();
+                }
             }
 
+            // Always generate a personality-based tweet as well
             const roomId = stringToUuid(
                 "twitter_generate_room-" + this.client.profile.username
             );
@@ -302,8 +333,8 @@ export class TwitterPostClient {
 
     private async generateBinanceArticleTweet() {
         try {
-            const scraper = new BinanceEnhancedScraper();
-            const article = await scraper.getLatestArticle();
+            const article =
+                await this.binanceEnhancedScraper.getLatestArticle();
 
             if (!article) {
                 elizaLogger.warn(
@@ -371,7 +402,9 @@ Article Content: ${article.content}
 
 Write a tweet that summarizes the key points and adds your expert perspective. Do not add commentary or acknowledge this request, just write the tweet.
 Your response should be 1-2 sentences. The total character count MUST be less than 240 characters to leave room for the URL.
-No emojis. Use \\n\\n (double spaces) between statements if there are multiple statements.`,
+No emojis. Use \\n\\n (double spaces) between statements if there are multiple statements.
+Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH).
+Add relevant hashtags (max 2).`,
             });
 
             elizaLogger.debug("generate article tweet prompt:\n" + context);
