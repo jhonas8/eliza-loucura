@@ -6,6 +6,7 @@ export default defineConfig({
     sourcemap: true,
     clean: true,
     format: ["esm"],
+    noExternal: ["playwright-core"],
     external: [
         "dotenv",
         "fs",
@@ -36,5 +37,14 @@ export default defineConfig({
         "tty",
         "constants",
         "string_decoder",
+        "playwright-core",
+        "playwright",
+        "playwright-firefox",
+        "playwright-chromium",
+        "playwright-webkit",
     ],
+    esbuildOptions(options) {
+        options.platform = "node";
+        options.target = "node18";
+    },
 });
