@@ -1,6 +1,6 @@
 import { elizaLogger } from "@elizaos/core";
+import puppeteer from "puppeteer";
 import * as cheerio from "cheerio";
-import { chromium } from "playwright";
 
 export interface BinanceArticle {
     title: string;
@@ -10,26 +10,30 @@ export interface BinanceArticle {
 }
 
 export class BinanceScraper {
-    private baseUrl =
-        "https://www.binance.com/en/support/announcement/c-48?c=48&type=1";
+    private baseUrl: string;
+    private announcementsUrl: string;
+
+    constructor() {
+        this.baseUrl = "https://www.binance.com";
+        this.announcementsUrl = `${this.baseUrl}/en/support/announcement/c-48?c=48&type=1`;
+    }
 
     private async getRenderedContent(
         url: string,
         waitTime: number = 30
     ): Promise<string> {
         elizaLogger.info(`Launching browser to fetch content from: ${url}`);
-        const browser = await chromium.launch({
+        const browser = await puppeteer.launch({
             headless: true,
         });
-
-        const context = await browser.newContext();
-        const page = await context.newPage();
+        const page = await browser.newPage();
 
         try {
             elizaLogger.info(`Navigating to URL with ${waitTime}s timeout...`);
-            await page.goto(url, { timeout: waitTime * 1000 });
-            elizaLogger.info("Waiting for network to be idle...");
-            await page.waitForLoadState("networkidle");
+            await page.goto(url, {
+                waitUntil: "networkidle0",
+                timeout: waitTime * 1000,
+            });
             elizaLogger.info("Page loaded successfully, getting content...");
             const content = await page.content();
             elizaLogger.info(
@@ -45,72 +49,97 @@ export class BinanceScraper {
         }
     }
 
+    async getArticleLinks(): Promise<Array<{ title: string; url: string }>> {
+        elizaLogger.info("Fetching recent Binance announcements...");
+
+        try {
+            const content = await this.getRenderedContent(
+                this.announcementsUrl
+            );
+            elizaLogger.info(`Got page content, length: ${content.length}`);
+
+            const $ = cheerio.load(content);
+            const articles: Array<{ title: string; url: string }> = [];
+
+            $(
+                "a.text-PrimaryText.hover\\:text-PrimaryYellow.active\\:text-PrimaryYellow.focus\\:text-PrimaryYellow.cursor-pointer.no-underline.w-fit"
+            ).each((_, element) => {
+                try {
+                    const titleEl = $(element).find("h3");
+                    if (!titleEl.length) return;
+
+                    const title = titleEl.text().trim();
+                    let link = $(element).attr("href");
+
+                    if (link && title) {
+                        elizaLogger.info(`Link: ${link}`);
+                        elizaLogger.info(`Title: ${title}`);
+
+                        const fullUrl = link.startsWith("/")
+                            ? `${this.baseUrl}${link}`
+                            : `${this.baseUrl}/${link}`;
+
+                        articles.push({
+                            title,
+                            url: fullUrl,
+                        });
+                        elizaLogger.info(`Found article: ${title}`);
+                    }
+                } catch (e) {
+                    elizaLogger.error(`Error extracting article info: ${e}`);
+                }
+            });
+
+            elizaLogger.info(`Found ${articles.length} recent announcements`);
+            return articles;
+        } catch (e) {
+            elizaLogger.error(`Error getting article links: ${e}`);
+            return [];
+        }
+    }
+
+    async getArticleContent(url: string): Promise<string> {
+        try {
+            const content = await this.getRenderedContent(url, 15);
+            const $ = cheerio.load(content);
+
+            // Get text content and clean it up
+            const textContent = $("body").text();
+            return textContent.replace(/\s+/g, " ").trim();
+        } catch (e) {
+            elizaLogger.error(`Error getting article content: ${e}`);
+            return "";
+        }
+    }
+
     async getLatestArticle(): Promise<BinanceArticle | null> {
         try {
-            elizaLogger.info("Starting to fetch latest Binance article...");
-            const html = await this.getRenderedContent(this.baseUrl);
-            elizaLogger.info("Parsing HTML with cheerio...");
-            const $ = cheerio.load(html);
+            const articles = await this.getArticleLinks();
 
-            // Find the first article
-            const articleSelector =
-                "a.text-PrimaryText.hover\\:text-PrimaryYellow";
-            elizaLogger.info(
-                `Looking for articles using selector: ${articleSelector}`
-            );
-            const allArticles = $(articleSelector);
-            elizaLogger.info(`Found ${allArticles.length} total articles`);
-
-            const firstArticleLink = allArticles.first();
-            if (!firstArticleLink.length) {
-                elizaLogger.warn(
-                    `No articles found on Binance announcements page. HTML snippet: ${html.substring(0, 500)}...`
-                );
+            if (articles.length === 0) {
+                elizaLogger.warn("No articles found");
                 return null;
             }
 
-            elizaLogger.info("Found first article, extracting details...");
-            const title = firstArticleLink.find("h3").text().trim();
-            elizaLogger.info(`Extracted title: ${title}`);
+            // Get the first article's content
+            const firstArticle = articles[0];
+            elizaLogger.info(
+                `Processing latest article: ${firstArticle.title}`
+            );
 
-            const url = firstArticleLink.attr("href");
-            elizaLogger.info(`Extracted URL: ${url}`);
+            const content = await this.getArticleContent(firstArticle.url);
 
-            const dateText = firstArticleLink.find("time").attr("datetime");
-            elizaLogger.info(`Extracted date: ${dateText}`);
-
-            if (!url || !title) {
-                elizaLogger.warn(
-                    `Missing required data - URL: ${!!url}, Title: ${!!title}`
-                );
-                elizaLogger.warn(
-                    `Article link HTML: ${firstArticleLink.html()}`
-                );
+            if (!content) {
+                elizaLogger.warn("Could not fetch article content");
                 return null;
             }
 
-            const fullUrl = url.startsWith("/")
-                ? `https://www.binance.com${url}`
-                : url;
-            elizaLogger.info(`Constructed full URL: ${fullUrl}`);
-
-            // Get the full article content
-            elizaLogger.info("Fetching full article content...");
-            const articleHtml = await this.getRenderedContent(fullUrl);
-            const $article = cheerio.load(articleHtml);
-            const content = $article("body").text().replace(/\s+/g, " ").trim();
-            elizaLogger.info(
-                `Extracted content length: ${content.length} characters`
-            );
-
-            const article = {
-                title,
+            return {
+                title: firstArticle.title,
                 content,
-                url: fullUrl,
-                date: new Date(dateText || new Date().toISOString()),
+                url: firstArticle.url,
+                date: new Date(), // Since date is not critical for our use case
             };
-            elizaLogger.info("Successfully created article object:", article);
-            return article;
         } catch (error) {
             elizaLogger.error("Error in getLatestArticle:", error);
             elizaLogger.error("Stack trace:", error.stack);
