@@ -301,31 +301,17 @@ Write only the tweet text:`;
     }
 
     async start() {
-        elizaLogger.log("Tweet generation loop started");
+        elizaLogger.log("Starting Binance article monitoring...");
 
-        // Regular personality-based tweets
-        const tweetLoop = async () => {
-            await this.generateNewTweet();
-            setTimeout(tweetLoop, this.postInterval * 60 * 1000);
-        };
-
-        if (this.postImmediately) {
-            await tweetLoop();
-        } else {
-            setTimeout(tweetLoop, this.postInterval * 60 * 1000);
-        }
-
-        // Both Binance article monitoring systems
+        // Check for new articles every minute
         setInterval(
             async () => {
-                await this.checkAndTweetNewArticle(); // Original
-                await this.checkAndTweetNewBinanceEnhancedArticle(); // Enhanced
+                await this.checkAndTweetNewArticle();
             },
-            5 * 60 * 1000
+            60 * 1000 // 1 minute
         );
 
-        // Initial checks
+        // Initial check
         await this.checkAndTweetNewArticle();
-        await this.checkAndTweetNewBinanceEnhancedArticle();
     }
 }
