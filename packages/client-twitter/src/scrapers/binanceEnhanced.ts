@@ -77,7 +77,7 @@ export class BinanceEnhancedScraper {
             elizaLogger.info("Fetching recent Binance announcements...");
             const pageContent = await this.getRenderedContent(
                 this.announcementsUrl,
-                15 // Reduced timeout for the list page
+                40 // Increased timeout for the list page
             );
             const $ = cheerio.load(pageContent);
 
@@ -101,8 +101,8 @@ export class BinanceEnhancedScraper {
             elizaLogger.info(`Found article: ${title}`);
             elizaLogger.info(`Fetching content from: ${fullUrl}`);
 
-            // Get article content
-            const articleHtml = await this.getRenderedContent(fullUrl, 30);
+            // Get article content with increased timeout
+            const articleHtml = await this.getRenderedContent(fullUrl, 40);
             const $article = cheerio.load(articleHtml);
 
             // Try different selectors for content
