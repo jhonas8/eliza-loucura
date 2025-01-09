@@ -55,7 +55,7 @@ Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 Write an engaging tweet about this Binance news article:
 
 Title: ${article.title}
-Content: ${article.content ? article.content.substring(0, 500) : ""}...
+Content: ${article.content ? article.content.substring(0, 1000) : ""}...
 
 Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
@@ -260,7 +260,7 @@ Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 Write an engaging tweet about this Binance news article:
 
 Title: ${article.title}
-Content: ${article.content ? article.content.substring(0, 500) : ""}...
+Content: ${article.content ? article.content.substring(0, 1000) : ""}...
 
 Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
@@ -303,12 +303,12 @@ Write only the tweet text:`;
     async start() {
         elizaLogger.log("Starting Binance article monitoring...");
 
-        // Check for new articles every minute
+        // Check for new articles every 5 minutes
         setInterval(
             async () => {
                 await this.checkAndTweetNewArticle();
             },
-            60 * 1000 // 1 minute
+            5 * 60 * 1000 // 5 minutes
         );
 
         // Initial check
