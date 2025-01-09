@@ -16,8 +16,7 @@ export default defineConfig({
         "http",
         "agentkeepalive",
         "cheerio",
-        "playwright",
-        "playwright-core",
-        // Add other modules you want to externalize
+        "puppeteer",
+        "puppeteer-core",
     ],
 });
