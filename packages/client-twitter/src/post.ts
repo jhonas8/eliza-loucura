@@ -16,7 +16,7 @@ import { IImageDescriptionService, ServiceType } from "@elizaos/core";
 import { buildConversationThread } from "./utils.ts";
 import { twitterMessageHandlerTemplate } from "./interactions.ts";
 import { DEFAULT_MAX_TWEET_LENGTH } from "./environment.ts";
-import { BinanceEnhancedScraper } from "./binance-scraper.ts";
+import { BinanceEnhancedScraper } from "./scrapers/binanceEnhanced.ts";
 
 const twitterPostTemplate = `
 # Areas of Expertise
