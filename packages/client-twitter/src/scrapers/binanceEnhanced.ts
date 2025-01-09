@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import { chromium } from "playwright";
 import * as cheerio from "cheerio";
 import { elizaLogger } from "@elizaos/core";
 
@@ -22,22 +22,16 @@ export class BinanceEnhancedScraper {
         url: string,
         waitTime: number = 30
     ): Promise<string> {
-        const browser = await puppeteer.launch({
+        const browser = await chromium.launch({
             headless: true,
-            args: [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-            ],
         });
-        const page = await browser.newPage();
+
+        const context = await browser.newContext();
+        const page = await context.newPage();
 
         try {
-            await page.goto(url, {
-                waitUntil: "networkidle0",
-                timeout: waitTime * 1000,
-            });
+            await page.goto(url, { timeout: waitTime * 1000 });
+            await page.waitForLoadState("networkidle");
             const content = await page.content();
             return content;
         } finally {

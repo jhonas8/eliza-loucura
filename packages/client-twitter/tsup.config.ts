@@ -15,6 +15,9 @@ export default defineConfig({
         "https",
         "http",
         "agentkeepalive",
+        "cheerio",
+        "playwright",
+        "playwright-core",
         // Add other modules you want to externalize
     ],
 });
