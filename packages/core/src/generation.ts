@@ -240,7 +240,10 @@ export async function generateText({
             model: openai.languageModel(model),
             prompt: context,
             system:
-                runtime.character.system ?? settings.SYSTEM_PROMPT ?? undefined,
+                customSystemPrompt ||
+                runtime.character.system ||
+                settings.SYSTEM_PROMPT ||
+                undefined,
             tools: tools,
             onStepFinish: onStepFinish,
             maxSteps: maxSteps,

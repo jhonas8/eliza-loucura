@@ -51,7 +51,7 @@ Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 Write an engaging tweet about this Binance news article:
 
 Title: ${article.title}
-Content: ${article.content.substring(0, 500)}...
+Content: ${article.content ? article.content.substring(0, 500) : ""}...
 
 Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
@@ -68,7 +68,7 @@ The tweet should:
 
 Write only the tweet text:`;
 
-            return await textGenService.queueTextCompletion(
+            const response = await textGenService.queueTextCompletion(
                 prompt,
                 0.7,
                 [],
@@ -76,6 +76,8 @@ Write only the tweet text:`;
                 0,
                 280
             );
+
+            return response.trim();
         };
 
         let tweetText = await generateTweet();
@@ -254,7 +256,7 @@ Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 Write an engaging tweet about this Binance news article:
 
 Title: ${article.title}
-Content: ${article.content.substring(0, 500)}...
+Content: ${article.content ? article.content.substring(0, 500) : ""}...
 
 Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
@@ -271,7 +273,7 @@ The tweet should:
 
 Write only the tweet text:`;
 
-            return await textGenService.queueTextCompletion(
+            const response = await textGenService.queueTextCompletion(
                 prompt,
                 0.7,
                 [],
@@ -279,6 +281,8 @@ Write only the tweet text:`;
                 0,
                 280
             );
+
+            return response.trim();
         };
 
         let tweetText = await generateTweet();
