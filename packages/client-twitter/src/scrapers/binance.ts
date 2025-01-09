@@ -1,6 +1,6 @@
 import { elizaLogger } from "@elizaos/core";
-import puppeteer from "puppeteer";
-import { Page } from "puppeteer";
+import * as cheerio from "cheerio";
+import fetch from "node-fetch";
 
 export interface BinanceArticle {
     title: string;
@@ -11,119 +11,76 @@ export interface BinanceArticle {
 
 export class BinanceScraper {
     private baseUrl = "https://www.binance.com/en/news";
-    private page: Page | null = null;
+    private browserlessApiKey = process.env.BROWSERLESS_API_KEY;
+    private browserlessUrl = `https://chrome.browserless.io/content?token=${this.browserlessApiKey}`;
 
-    async init() {
+    private async fetchRenderedContent(url: string): Promise<string> {
         try {
-            const browser = await puppeteer.launch({
-                headless: "new",
-                args: [
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu",
-                    "--no-first-run",
-                    "--no-zygote",
-                    "--single-process",
-                ],
-                ignoreDefaultArgs: ["--enable-automation"],
-                env: {
-                    ...process.env,
-                    DISPLAY: undefined,
-                    XAUTHORITY: undefined,
+            const response = await fetch(this.browserlessUrl, {
+                method: "POST",
+                headers: {
+                    "Cache-Control": "no-cache",
+                    "Content-Type": "application/json",
                 },
+                body: JSON.stringify({
+                    url,
+                    waitFor: ".css-1wr4jig", // Wait for article container
+                    gotoOptions: {
+                        waitUntil: "networkidle0",
+                        timeout: 30000,
+                    },
+                }),
             });
 
-            this.page = await browser.newPage();
-            await this.page.setViewport({ width: 1366, height: 768 });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-            // Disable unnecessary features that might cause issues
-            await this.page.setRequestInterception(true);
-            this.page.on("request", (request) => {
-                const resourceType = request.resourceType();
-                if (
-                    resourceType === "image" ||
-                    resourceType === "font" ||
-                    resourceType === "media"
-                ) {
-                    request.abort();
-                } else {
-                    request.continue();
-                }
-            });
+            return await response.text();
         } catch (error) {
-            elizaLogger.error("Error initializing BinanceScraper:", error);
+            elizaLogger.error("Error fetching rendered content:", error);
             throw error;
         }
     }
 
     async getLatestArticle(): Promise<BinanceArticle | null> {
         try {
-            if (!this.page) {
-                await this.init();
-            }
-
             elizaLogger.info("Fetching latest Binance article...");
-            await this.page.goto(this.baseUrl, {
-                waitUntil: "networkidle0",
-                timeout: 30000,
-            });
+            const html = await this.fetchRenderedContent(this.baseUrl);
+            const $ = cheerio.load(html);
 
-            // Wait for the articles to load
-            await this.page.waitForSelector(".css-1wr4jig");
-
-            // Get the first (latest) article
-            const firstArticle = await this.page.evaluate(() => {
-                const articleElement = document.querySelector(".css-1wr4jig");
-                if (!articleElement) return null;
-
-                const titleElement = articleElement.querySelector("h2");
-                const linkElement = articleElement.querySelector("a");
-                const dateElement = articleElement.querySelector("time");
-
-                return {
-                    title: titleElement?.textContent?.trim() || "",
-                    url: linkElement?.href || "",
-                    date:
-                        dateElement?.getAttribute("datetime") ||
-                        new Date().toISOString(),
-                };
-            });
-
-            if (!firstArticle) {
+            // Get the first article
+            const firstArticle = $(".css-1wr4jig").first();
+            if (!firstArticle.length) {
                 elizaLogger.warn("No articles found on Binance news page");
                 return null;
             }
 
-            // Navigate to the article page to get its content
-            await this.page.goto(firstArticle.url, {
-                waitUntil: "networkidle0",
-                timeout: 30000,
-            });
+            const title = firstArticle.find("h2").text().trim();
+            const url = firstArticle.find("a").attr("href");
+            const dateText =
+                firstArticle.find("time").attr("datetime") ||
+                new Date().toISOString();
 
-            // Get the article content
-            const content = await this.page.evaluate(() => {
-                const articleContent = document.querySelector(".css-1nfyzg8");
-                return articleContent?.textContent?.trim() || "";
-            });
+            if (!url || !title) {
+                elizaLogger.warn("Could not extract article details");
+                return null;
+            }
+
+            // Get the full article content
+            const articleHtml = await this.fetchRenderedContent(url);
+            const $article = cheerio.load(articleHtml);
+            const content = $article(".css-1nfyzg8").text().trim();
 
             return {
-                title: firstArticle.title,
-                content: content,
-                url: firstArticle.url,
-                date: new Date(firstArticle.date),
+                title,
+                content,
+                url,
+                date: new Date(dateText),
             };
         } catch (error) {
             elizaLogger.error("Error fetching Binance article:", error);
             return null;
-        }
-    }
-
-    async close() {
-        if (this.page) {
-            const browser = this.page.browser();
-            await browser.close();
-            this.page = null;
         }
     }
 }

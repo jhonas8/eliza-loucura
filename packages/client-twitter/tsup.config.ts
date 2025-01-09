@@ -16,7 +16,5 @@ export default defineConfig({
         "http",
         "agentkeepalive",
         "cheerio",
-        "puppeteer",
-        "puppeteer-core",
     ],
 });
