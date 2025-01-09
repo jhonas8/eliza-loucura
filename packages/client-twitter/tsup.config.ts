@@ -19,5 +19,10 @@ export default defineConfig({
         "form-data",
         "whatwg-url",
         "@elizaos/core",
+        "playwright",
+        "playwright-core",
+        "puppeteer",
+        "puppeteer-core",
+        "cheerio",
     ],
 });
