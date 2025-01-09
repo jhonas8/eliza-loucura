@@ -33,7 +33,6 @@ export class TwitterPostClient {
     private async generateTweetFromArticle(
         article: BinanceArticle
     ): Promise<string> {
-        // Use the runtime's text generation service to create a tweet about the article
         const textGenService = this.runtime.getService<ITextGenerationService>(
             ServiceType.TEXT_GENERATION
         );
@@ -41,7 +40,10 @@ export class TwitterPostClient {
             throw new Error("Text generation service not available");
         }
 
-        const prompt = `You are a crypto expert and enthusiast. Write an engaging tweet about this Binance news article:
+        const generateTweet = async (
+            requestShorter: boolean = false
+        ): Promise<string> => {
+            const prompt = `You are a crypto expert and enthusiast. Write an engaging tweet about this Binance news article:
 Title: ${article.title}
 Content: ${article.content.substring(0, 500)}...
 
@@ -51,21 +53,32 @@ The tweet should:
 3. Use appropriate crypto terminology
 4. Be engaging and professional
 5. Leave room for the URL at the end
-6. Not exceed 240 characters (excluding URL)
+6. Not exceed ${requestShorter ? "200" : "240"} characters (excluding URL)${requestShorter ? "\n7. Make it shorter than the previous attempt" : ""}
 
 Write only the tweet text:`;
 
-        const response = await textGenService.queueTextCompletion(
-            prompt,
-            0.7,
-            [],
-            0,
-            0,
-            100
-        );
+            const response = await textGenService.queueTextCompletion(
+                prompt,
+                0.7,
+                [],
+                0,
+                0,
+                240
+            );
 
-        // Add the article URL to the tweet
-        return `${response.trim()} ${article.url}`;
+            return response.trim();
+        };
+
+        let tweetText = await generateTweet();
+        const urlLength = article.url.length + 1; // +1 for the space
+
+        // If tweet + URL exceeds Twitter's limit, try again with a shorter request
+        if (tweetText.length + urlLength > 280) {
+            elizaLogger.info("Tweet too long, generating shorter version...");
+            tweetText = await generateTweet(true);
+        }
+
+        return `${tweetText} ${article.url}`;
     }
 
     private async checkAndTweetNewArticle(): Promise<void> {
@@ -113,9 +126,12 @@ Write only the tweet text:`;
                 throw new Error("Text generation service not available");
             }
 
-            const prompt = `You are ${this.runtime.character.name}, a ${
-                this.runtime.character.bio
-            }. Write a tweet that matches your personality.
+            const generateTweet = async (
+                requestShorter: boolean = false
+            ): Promise<string> => {
+                const prompt = `You are ${this.runtime.character.name}, a ${
+                    this.runtime.character.bio
+                }. Write a tweet that matches your personality.
 
 Directions:
 ${this.client.directions}
@@ -123,16 +139,31 @@ ${this.client.directions}
 Additional context:
 ${JSON.stringify(state, null, 2)}
 
+Requirements:
+1. Must not exceed ${requestShorter ? "200" : "240"} characters
+2. Must be engaging and informative${requestShorter ? "\n3. Make it shorter than the previous attempt" : ""}
+
 Write only the tweet text:`;
 
-            const response = await textGenService.queueTextCompletion(
-                prompt,
-                this.client.temperature,
-                [],
-                0,
-                0,
-                280
-            );
+                return await textGenService.queueTextCompletion(
+                    prompt,
+                    this.client.temperature,
+                    [],
+                    0,
+                    0,
+                    240
+                );
+            };
+
+            let response = await generateTweet();
+
+            // If tweet exceeds Twitter's limit, try again with a shorter request
+            if (response.length > 280) {
+                elizaLogger.info(
+                    "Tweet too long, generating shorter version..."
+                );
+                response = await generateTweet(true);
+            }
 
             if (this.client.twitterConfig.TWITTER_DRY_RUN) {
                 elizaLogger.info("Dry run mode - would tweet:", response);
@@ -204,7 +235,10 @@ Write only the tweet text:`;
             throw new Error("Text generation service not available");
         }
 
-        const prompt = `You are ${this.runtime.character.name}, a crypto expert and enthusiast.
+        const generateTweet = async (
+            requestShorter: boolean = false
+        ): Promise<string> => {
+            const prompt = `You are ${this.runtime.character.name}, a crypto expert and enthusiast.
 Write an engaging tweet about this Binance news article:
 
 Title: ${article.title}
@@ -216,26 +250,36 @@ The tweet should:
 3. Use appropriate crypto terminology
 4. Be engaging and professional
 5. Leave room for the URL at the end
-6. Not exceed 240 characters (excluding URL)
+6. Not exceed ${requestShorter ? "200" : "240"} characters (excluding URL)
 7. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
 8. Add relevant hashtags (max 2)
-9. Maintain your unique personality as ${this.runtime.character.name}
+9. Maintain your unique personality as ${this.runtime.character.name}${requestShorter ? "\n10. Make it shorter than the previous attempt" : ""}
 
 Character's Bio: ${this.runtime.character.bio}
 Character's Style: ${this.client.directions}
 
 Write only the tweet text:`;
 
-        const response = await textGenService.queueTextCompletion(
-            prompt,
-            0.7,
-            [],
-            0,
-            0,
-            240
-        );
+            return await textGenService.queueTextCompletion(
+                prompt,
+                0.7,
+                [],
+                0,
+                0,
+                240
+            );
+        };
 
-        return `${response.trim()} ${article.url}`;
+        let tweetText = await generateTweet();
+        const urlLength = article.url.length + 1; // +1 for the space
+
+        // If tweet + URL exceeds Twitter's limit, try again with a shorter request
+        if (tweetText.length + urlLength > 280) {
+            elizaLogger.info("Tweet too long, generating shorter version...");
+            tweetText = await generateTweet(true);
+        }
+
+        return `${tweetText} ${article.url}`;
     }
 
     async start() {
