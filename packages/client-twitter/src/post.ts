@@ -6,10 +6,12 @@ import {
 } from "@elizaos/core";
 import { ClientBase } from "./base.ts";
 import { BinanceScraper, BinanceArticle } from "./scrapers/binance.ts";
+import { BinanceEnhancedScraper } from "./scrapers/binanceEnhanced";
 
 export class TwitterPostClient {
     private lastArticleUrl: string | null = null;
     private binanceScraper: BinanceScraper;
+    private binanceEnhancedScraper: BinanceEnhancedScraper;
     private postInterval: number;
     private postImmediately: boolean;
 
@@ -18,6 +20,7 @@ export class TwitterPostClient {
         private runtime: IAgentRuntime
     ) {
         this.binanceScraper = new BinanceScraper();
+        this.binanceEnhancedScraper = new BinanceEnhancedScraper();
         this.postInterval = Math.floor(
             Math.random() *
                 (this.client.twitterConfig.POST_INTERVAL_MAX -
@@ -142,10 +145,103 @@ Write only the tweet text:`;
         }
     }
 
+    private async checkAndTweetNewBinanceEnhancedArticle(): Promise<void> {
+        try {
+            const article =
+                await this.binanceEnhancedScraper.getLatestArticle();
+
+            if (!article) {
+                elizaLogger.warn("No enhanced article found");
+                return;
+            }
+
+            // Check if we've already tweeted about this article
+            const lastProcessedUrl =
+                await this.client.runtime.cacheManager.get<string>(
+                    "twitter/last_binance_enhanced_article_url"
+                );
+
+            if (lastProcessedUrl === article.url) {
+                elizaLogger.info("Enhanced article already processed");
+                return;
+            }
+
+            // Generate and post the tweet
+            const tweetText =
+                await this.generateEnhancedTweetFromArticle(article);
+
+            if (this.client.twitterConfig.TWITTER_DRY_RUN) {
+                elizaLogger.info("Dry run mode - would tweet:", tweetText);
+            } else {
+                await this.client.twitterClient.sendTweet(tweetText);
+                elizaLogger.info(
+                    "Successfully tweeted enhanced Binance article"
+                );
+
+                // Cache the processed article URL
+                await this.client.runtime.cacheManager.set(
+                    "twitter/last_binance_enhanced_article_url",
+                    article.url,
+                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
+                );
+            }
+        } catch (error) {
+            elizaLogger.error(
+                "Error in enhanced Binance article processing:",
+                error
+            );
+        }
+    }
+
+    private async generateEnhancedTweetFromArticle(
+        article: BinanceArticle
+    ): Promise<string> {
+        const textGenService = this.runtime.getService<ITextGenerationService>(
+            ServiceType.TEXT_GENERATION
+        );
+
+        if (!textGenService) {
+            throw new Error("Text generation service not available");
+        }
+
+        const prompt = `You are ${this.runtime.character.name}, a crypto expert and enthusiast.
+Write an engaging tweet about this Binance news article:
+
+Title: ${article.title}
+Content: ${article.content.substring(0, 1000)}...
+
+The tweet should:
+1. Be informative but concise
+2. Include the most important points from the article
+3. Use appropriate crypto terminology
+4. Be engaging and professional
+5. Leave room for the URL at the end
+6. Not exceed 240 characters (excluding URL)
+7. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
+8. Add relevant hashtags (max 2)
+9. Maintain your unique personality as ${this.runtime.character.name}
+
+Character's Bio: ${this.runtime.character.bio}
+Character's Style: ${this.client.directions}
+
+Write only the tweet text:`;
+
+        const response = await textGenService.queueTextCompletion(
+            prompt,
+            0.7,
+            [],
+            0,
+            0,
+            240
+        );
+
+        return `${response.trim()} ${article.url}`;
+    }
+
     async start() {
         elizaLogger.log("Tweet generation loop started");
 
-        // Start regular personality-based tweet generation
+        // Regular personality-based tweets
         const tweetLoop = async () => {
             await this.generateNewTweet();
             setTimeout(tweetLoop, this.postInterval * 60 * 1000);
@@ -157,16 +253,17 @@ Write only the tweet text:`;
             setTimeout(tweetLoop, this.postInterval * 60 * 1000);
         }
 
-        // Start Binance article monitoring
-        // Check for new articles every 5 minutes
+        // Both Binance article monitoring systems
         setInterval(
             async () => {
-                await this.checkAndTweetNewArticle();
+                await this.checkAndTweetNewArticle(); // Original
+                await this.checkAndTweetNewBinanceEnhancedArticle(); // Enhanced
             },
             5 * 60 * 1000
         );
 
-        // Initial article check
+        // Initial checks
         await this.checkAndTweetNewArticle();
+        await this.checkAndTweetNewBinanceEnhancedArticle();
     }
 }
