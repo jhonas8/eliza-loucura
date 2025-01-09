@@ -26,23 +26,58 @@ export class BinanceEnhancedScraper {
             headless: true,
         });
 
+        let content = "";
         const context = await browser.newContext();
         const page = await context.newPage();
 
         try {
-            await page.goto(url, { timeout: waitTime * 1000 });
+            elizaLogger.info(`Navigating to URL with ${waitTime}s timeout...`);
+            await page.goto(url, {
+                timeout: waitTime * 1000,
+                waitUntil: "networkidle",
+            });
+
+            // Wait for the main content to be visible
+            if (url.includes("/support/announcement/c-48")) {
+                // For the announcements list page
+                await page.waitForSelector("a.text-PrimaryText", {
+                    timeout: waitTime * 1000,
+                });
+            } else {
+                // For individual article pages
+                await page.waitForSelector("article, .css-1nfyzg8", {
+                    timeout: waitTime * 1000,
+                });
+            }
+
+            // Additional wait to ensure dynamic content is loaded
             await page.waitForLoadState("networkidle");
-            const content = await page.content();
+            await new Promise((resolve) => setTimeout(resolve, 2000)); // Extra 2s safety margin
+
+            elizaLogger.info("Page loaded successfully, getting content...");
+            content = await page.content();
+
             return content;
+        } catch (error) {
+            elizaLogger.error("Error during page rendering:", error);
+            throw error;
         } finally {
-            await browser.close();
+            try {
+                await context.close();
+                await browser.close();
+                elizaLogger.info("Browser closed");
+            } catch (error) {
+                elizaLogger.error("Error closing browser:", error);
+            }
         }
     }
 
     async getLatestArticle(): Promise<BinanceArticle | null> {
         try {
+            elizaLogger.info("Fetching recent Binance announcements...");
             const pageContent = await this.getRenderedContent(
-                this.announcementsUrl
+                this.announcementsUrl,
+                15 // Reduced timeout for the list page
             );
             const $ = cheerio.load(pageContent);
 
@@ -51,27 +86,51 @@ export class BinanceEnhancedScraper {
                 "a.text-PrimaryText.hover\\:text-PrimaryYellow"
             ).first();
             if (!firstArticleLink.length) {
+                elizaLogger.warn("No article links found on the page");
                 return null;
             }
 
             const title = firstArticleLink.find("h3").text().trim();
             const url = firstArticleLink.attr("href");
             if (!url || !title) {
+                elizaLogger.warn("Missing title or URL from article link");
                 return null;
             }
 
             const fullUrl = url.startsWith("/") ? `${this.baseUrl}${url}` : url;
+            elizaLogger.info(`Found article: ${title}`);
+            elizaLogger.info(`Fetching content from: ${fullUrl}`);
 
             // Get article content
-            const articleHtml = await this.getRenderedContent(fullUrl);
+            const articleHtml = await this.getRenderedContent(fullUrl, 30);
             const $article = cheerio.load(articleHtml);
-            const content = $article("body").text().replace(/\s+/g, " ").trim();
+
+            // Try different selectors for content
+            const contentSelectors = [
+                "article",
+                ".css-1nfyzg8",
+                ".announcement-content",
+            ];
+            let content = "";
+
+            for (const selector of contentSelectors) {
+                const element = $article(selector);
+                if (element.length) {
+                    content = element.text().replace(/\s+/g, " ").trim();
+                    break;
+                }
+            }
+
+            if (!content) {
+                content = $article("body").text().replace(/\s+/g, " ").trim();
+            }
 
             // Try to find the date in the article, fallback to current date if not found
             const dateText =
                 $article("time").attr("datetime") || new Date().toISOString();
             const date = new Date(dateText);
 
+            elizaLogger.info("Successfully fetched article content");
             return {
                 title,
                 content,
@@ -79,7 +138,7 @@ export class BinanceEnhancedScraper {
                 date,
             };
         } catch (error) {
-            elizaLogger.error("Error getting latest article:", error);
+            elizaLogger.error("Error getting article content:", error);
             return null;
         }
     }
