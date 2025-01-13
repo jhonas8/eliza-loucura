@@ -2,7 +2,6 @@ import {
     IAgentRuntime,
     elizaLogger,
     ITextGenerationService,
-    ServiceType,
 } from "@elizaos/core";
 import { ClientBase } from "./base.ts";
 import { BinanceScraper, BinanceArticle } from "./scrapers/binance.ts";
@@ -13,8 +12,6 @@ import {
 import { OpenAIService } from "../../plugin-node/src/services/openai";
 
 export class TwitterPostClient {
-    private lastAnnouncementUrl: string | null = null;
-    private lastNewsUrl: string | null = null;
     private binanceScraper: BinanceScraper;
     private binanceSquareScraper: BinanceSquareScraper;
     private textGenService: ITextGenerationService;
@@ -101,7 +98,12 @@ Write only the tweet text:`;
             }
 
             // Check if we've already tweeted about this article
-            if (this.lastAnnouncementUrl === article.url) {
+            const lastProcessedUrl =
+                await this.runtime.cacheManager.get<string>(
+                    "twitter/last_binance_announcement_url"
+                );
+
+            if (lastProcessedUrl === article.url) {
                 elizaLogger.info("Announcement already tweeted");
                 return;
             }
@@ -119,10 +121,14 @@ Write only the tweet text:`;
                 elizaLogger.info(
                     "Successfully tweeted about new Binance announcement"
                 );
-            }
 
-            // Update the last article URL
-            this.lastAnnouncementUrl = article.url;
+                // Cache the processed article URL
+                await this.runtime.cacheManager.set(
+                    "twitter/last_binance_announcement_url",
+                    article.url,
+                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
+                );
+            }
         } catch (error) {
             elizaLogger.error("Error in checkAndTweetNewAnnouncement:", error);
         }
@@ -138,7 +144,12 @@ Write only the tweet text:`;
             }
 
             // Check if we've already tweeted about this article
-            if (this.lastNewsUrl === article.url) {
+            const lastProcessedUrl =
+                await this.runtime.cacheManager.get<string>(
+                    "twitter/last_binance_news_url"
+                );
+
+            if (lastProcessedUrl === article.url) {
                 elizaLogger.info("News article already tweeted");
                 return;
             }
@@ -156,10 +167,14 @@ Write only the tweet text:`;
                 elizaLogger.info(
                     "Successfully tweeted about new Binance news article"
                 );
-            }
 
-            // Update the last article URL
-            this.lastNewsUrl = article.url;
+                // Cache the processed article URL
+                await this.runtime.cacheManager.set(
+                    "twitter/last_binance_news_url",
+                    article.url,
+                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
+                );
+            }
         } catch (error) {
             elizaLogger.error("Error in checkAndTweetNewNews:", error);
         }
@@ -168,13 +183,13 @@ Write only the tweet text:`;
     async start() {
         elizaLogger.log("Starting Binance content monitoring...");
 
-        // Check for new content every 5 minutes
+        // Check for new content every minute
         setInterval(
             async () => {
                 await this.checkAndTweetNewAnnouncement();
                 await this.checkAndTweetNewNews();
             },
-            5 * 60 * 1000 // 5 minutes
+            60 * 1000 // 1 minute
         );
 
         // Initial checks
