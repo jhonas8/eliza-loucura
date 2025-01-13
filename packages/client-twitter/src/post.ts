@@ -252,6 +252,7 @@ Write only the tweet text:`;
         const generateTweet = async (
             requestShorter: boolean = false
         ): Promise<string> => {
+            i;
             const prompt = `You are ${this.runtime.character.name}, ${this.runtime.character.bio.join(", ")}.
 Your personality traits: ${this.runtime.character.adjectives.join(", ")}.
 Your style: ${this.runtime.character.style.all.join(", ")}.
