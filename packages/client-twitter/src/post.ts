@@ -4,24 +4,19 @@ import {
     ITextGenerationService,
 } from "@elizaos/core";
 import { ClientBase } from "./base.ts";
-import { BinanceScraper, BinanceArticle } from "./scrapers/binance.ts";
-import {
-    BinanceSquareScraper,
-    BinanceSquareArticle,
-} from "./scrapers/binanceSquare";
+import { CoinTelegraphScraper, CTArticle } from "./scrapers/cointelegraph";
 import { OpenAIService } from "../../plugin-node/src/services/openai";
 
 export class TwitterPostClient {
-    private binanceScraper: BinanceScraper;
-    private binanceSquareScraper: BinanceSquareScraper;
+    private lastArticleUrl: string | null = null;
+    private ctScraper: CoinTelegraphScraper;
     private textGenService: ITextGenerationService;
 
     constructor(
         private client: ClientBase,
         private runtime: IAgentRuntime
     ) {
-        this.binanceScraper = new BinanceScraper();
-        this.binanceSquareScraper = new BinanceSquareScraper();
+        this.ctScraper = new CoinTelegraphScraper();
 
         // Initialize OpenAI service
         this.textGenService = new OpenAIService();
@@ -30,8 +25,7 @@ export class TwitterPostClient {
     }
 
     private async generateTweetFromArticle(
-        article: BinanceArticle | BinanceSquareArticle,
-        isNews: boolean = false
+        article: CTArticle
     ): Promise<string> {
         if (!this.textGenService) {
             throw new Error("Text generation service not available");
@@ -45,10 +39,12 @@ Your personality traits: ${this.runtime.character.adjectives.join(", ")}.
 Your style: ${this.runtime.character.style.all.join(", ")}.
 Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 
-Write an engaging tweet about this Binance ${isNews ? "news article" : "announcement"}:
+Write an engaging tweet about this crypto news article:
 
 Title: ${article.title}
-Content: ${article.content ? article.content.substring(0, 500) : ""}...
+Author: ${article.author}
+Category: ${article.category}
+Content: ${article.content.substring(0, 500)}...
 
 Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
@@ -88,112 +84,61 @@ Write only the tweet text:`;
         return tweetText;
     }
 
-    private async checkAndTweetNewAnnouncement(): Promise<void> {
+    private async checkAndTweetNewArticle(): Promise<void> {
         try {
-            const article = await this.binanceScraper.getLatestArticle();
+            const article = await this.ctScraper.getLatestArticle();
 
             if (!article) {
-                elizaLogger.warn("No announcement found");
+                elizaLogger.warn("No article found");
                 return;
             }
 
             // Check if we've already tweeted about this article
             const lastProcessedUrl =
                 await this.runtime.cacheManager.get<string>(
-                    "twitter/last_binance_announcement_url"
+                    "twitter/last_ct_article_url"
                 );
 
             if (lastProcessedUrl === article.url) {
-                elizaLogger.info("Announcement already tweeted");
+                elizaLogger.info("Article already tweeted");
                 return;
             }
 
             // Generate and post the tweet
-            const tweetText = await this.generateTweetFromArticle(
-                article,
-                false
-            );
+            const tweetText = await this.generateTweetFromArticle(article);
 
             if (this.client.twitterConfig.TWITTER_DRY_RUN) {
                 elizaLogger.info("Dry run mode - would tweet:", tweetText);
             } else {
                 await this.client.twitterClient.sendTweet(tweetText);
                 elizaLogger.info(
-                    "Successfully tweeted about new Binance announcement"
+                    "Successfully tweeted about new CoinTelegraph article"
                 );
 
                 // Cache the processed article URL
                 await this.runtime.cacheManager.set(
-                    "twitter/last_binance_announcement_url",
+                    "twitter/last_ct_article_url",
                     article.url,
                     { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
                 );
             }
         } catch (error) {
-            elizaLogger.error("Error in checkAndTweetNewAnnouncement:", error);
-        }
-    }
-
-    private async checkAndTweetNewNews(): Promise<void> {
-        try {
-            const article = await this.binanceSquareScraper.getLatestArticle();
-
-            if (!article) {
-                elizaLogger.warn("No news article found");
-                return;
-            }
-
-            // Check if we've already tweeted about this article
-            const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(
-                    "twitter/last_binance_news_url"
-                );
-
-            if (lastProcessedUrl === article.url) {
-                elizaLogger.info("News article already tweeted");
-                return;
-            }
-
-            // Generate and post the tweet
-            const tweetText = await this.generateTweetFromArticle(
-                article,
-                true
-            );
-
-            if (this.client.twitterConfig.TWITTER_DRY_RUN) {
-                elizaLogger.info("Dry run mode - would tweet:", tweetText);
-            } else {
-                await this.client.twitterClient.sendTweet(tweetText);
-                elizaLogger.info(
-                    "Successfully tweeted about new Binance news article"
-                );
-
-                // Cache the processed article URL
-                await this.runtime.cacheManager.set(
-                    "twitter/last_binance_news_url",
-                    article.url,
-                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
-                );
-            }
-        } catch (error) {
-            elizaLogger.error("Error in checkAndTweetNewNews:", error);
+            elizaLogger.error("Error in checkAndTweetNewArticle:", error);
         }
     }
 
     async start() {
-        elizaLogger.log("Starting Binance content monitoring...");
+        elizaLogger.log("Starting CoinTelegraph news monitoring...");
 
         // Check for new content every minute
         setInterval(
             async () => {
-                await this.checkAndTweetNewAnnouncement();
-                await this.checkAndTweetNewNews();
+                await this.checkAndTweetNewArticle();
             },
             60 * 1000 // 1 minute
         );
 
-        // Initial checks
-        await this.checkAndTweetNewAnnouncement();
-        await this.checkAndTweetNewNews();
+        // Initial check
+        await this.checkAndTweetNewArticle();
     }
 }
