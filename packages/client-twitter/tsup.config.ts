@@ -6,7 +6,7 @@ export default defineConfig({
     sourcemap: true,
     clean: true,
     format: ["esm"],
-    noExternal: ["playwright-core"],
+    noExternal: ["playwright-core", "puppeteer"],
     external: [
         "dotenv",
         "fs",
@@ -42,9 +42,24 @@ export default defineConfig({
         "playwright-firefox",
         "playwright-chromium",
         "playwright-webkit",
+        "puppeteer",
+        "puppeteer-core",
+        "ws",
+        "readline",
+        "process",
+        "timers",
+        "fs/promises",
     ],
     esbuildOptions(options) {
         options.platform = "node";
         options.target = "node18";
+        options.mainFields = ["module", "main"];
+        options.conditions = ["module", "import", "require"];
+        options.banner = {
+            js: `
+                import { createRequire } from 'module';
+                const require = createRequire(import.meta.url);
+            `,
+        };
     },
 });
