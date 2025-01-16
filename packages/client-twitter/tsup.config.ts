@@ -18,7 +18,9 @@ export default defineConfig({
         "form-data-encoder",
         "formdata-node",
         "abort-controller",
-        // Node.js built-ins that need to be bundled
+    ],
+    external: [
+        // All Node.js built-ins should be external
         "http",
         "https",
         "net",
@@ -27,9 +29,6 @@ export default defineConfig({
         "stream",
         "util",
         "buffer",
-    ],
-    external: [
-        // Node.js built-ins that can remain external
         "dotenv",
         "fs",
         "path",
@@ -65,6 +64,15 @@ export default defineConfig({
             "process.env.NODE_DEBUG": "false",
             "global.Buffer": "Buffer",
             "global.process": "process",
+            // Add defines for Node.js built-ins
+            "require('http')": "await import('http')",
+            "require('https')": "await import('https')",
+            "require('net')": "await import('net')",
+            "require('tls')": "await import('tls')",
+            "require('events')": "await import('events')",
+            "require('stream')": "await import('stream')",
+            "require('util')": "await import('util')",
+            "require('buffer')": "await import('buffer')",
         };
         // Add pattern matching for external packages
         options.external = [
@@ -72,20 +80,20 @@ export default defineConfig({
             "playwright*",
             "@elizaos/*",
             "node:*",
+            // Add all Node.js built-ins
+            "http",
+            "https",
+            "net",
+            "tls",
+            "events",
+            "stream",
+            "util",
+            "buffer",
         ];
         // Add resolveExtensions to handle .js files
         options.resolveExtensions = [".ts", ".js", ".mjs", ".cjs"];
         // Ensure proper bundling of ESM dependencies
         options.format = "esm";
         options.bundle = true;
-        // Add Node.js built-in shims
-        options.inject = [
-            "node_modules/esbuild-node-builtins/http.js",
-            "node_modules/esbuild-node-builtins/https.js",
-            "node_modules/esbuild-node-builtins/stream.js",
-            "node_modules/esbuild-node-builtins/events.js",
-            "node_modules/esbuild-node-builtins/util.js",
-            "node_modules/esbuild-node-builtins/buffer.js",
-        ];
     },
 });
