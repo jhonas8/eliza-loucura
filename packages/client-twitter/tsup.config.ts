@@ -42,6 +42,7 @@ export default defineConfig({
         "playwright-firefox",
         "playwright-chromium",
         "playwright-webkit",
+        "node:stream",
     ],
     esbuildOptions(options) {
         options.platform = "node";
