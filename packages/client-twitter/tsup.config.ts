@@ -18,22 +18,25 @@ export default defineConfig({
         "form-data-encoder",
         "formdata-node",
         "abort-controller",
+        // Node.js built-ins that need to be bundled
+        "http",
+        "https",
+        "net",
+        "tls",
+        "events",
+        "stream",
+        "util",
+        "buffer",
     ],
     external: [
-        // Node.js built-ins
+        // Node.js built-ins that can remain external
         "dotenv",
         "fs",
         "path",
-        "stream",
-        "util",
-        "events",
         "os",
         "crypto",
-        "buffer",
         "url",
         "zlib",
-        "net",
-        "tls",
         "assert",
         "child_process",
         "worker_threads",
@@ -44,8 +47,6 @@ export default defineConfig({
         "tty",
         "constants",
         "string_decoder",
-        "http",
-        "https",
         // Node prefixed modules
         "node:*",
         // Dependencies that should be external
@@ -77,5 +78,14 @@ export default defineConfig({
         // Ensure proper bundling of ESM dependencies
         options.format = "esm";
         options.bundle = true;
+        // Add Node.js built-in shims
+        options.inject = [
+            "node_modules/esbuild-node-builtins/http.js",
+            "node_modules/esbuild-node-builtins/https.js",
+            "node_modules/esbuild-node-builtins/stream.js",
+            "node_modules/esbuild-node-builtins/events.js",
+            "node_modules/esbuild-node-builtins/util.js",
+            "node_modules/esbuild-node-builtins/buffer.js",
+        ];
     },
 });
