@@ -12,6 +12,12 @@ export default defineConfig({
         "bufferutil",
         "utf-8-validate",
         "stream/web",
+        // OpenAI and its dependencies
+        "openai",
+        "agentkeepalive",
+        "form-data-encoder",
+        "formdata-node",
+        "abort-controller",
     ],
     external: [
         // Node.js built-ins
@@ -38,6 +44,8 @@ export default defineConfig({
         "tty",
         "constants",
         "string_decoder",
+        "http",
+        "https",
         // Node prefixed modules
         "node:*",
         // Dependencies that should be external
@@ -46,9 +54,6 @@ export default defineConfig({
         "@node-llama-cpp",
         "puppeteer*",
         "playwright*",
-        "agentkeepalive",
-        "http*",
-        "https*",
     ],
     esbuildOptions(options) {
         options.platform = "node";
@@ -57,7 +62,6 @@ export default defineConfig({
         options.conditions = ["import", "module", "require", "default"];
         options.define = {
             "process.env.NODE_DEBUG": "false",
-            // Add global definitions for Node.js built-ins
             "global.Buffer": "Buffer",
             "global.process": "process",
         };
@@ -70,5 +74,8 @@ export default defineConfig({
         ];
         // Add resolveExtensions to handle .js files
         options.resolveExtensions = [".ts", ".js", ".mjs", ".cjs"];
+        // Ensure proper bundling of ESM dependencies
+        options.format = "esm";
+        options.bundle = true;
     },
 });
