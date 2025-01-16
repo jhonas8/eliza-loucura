@@ -6,7 +6,13 @@ export default defineConfig({
     sourcemap: true,
     clean: true,
     format: ["esm"],
-    noExternal: [],
+    noExternal: [
+        // Include ws and its dependencies to prevent dynamic require
+        "ws",
+        "bufferutil",
+        "utf-8-validate",
+        "stream/web",
+    ],
     external: [
         // Node.js built-ins
         "dotenv",
@@ -40,8 +46,6 @@ export default defineConfig({
         "@node-llama-cpp",
         "puppeteer*",
         "playwright*",
-        "ws",
-        "whatwg-url",
         "agentkeepalive",
         "http*",
         "https*",
@@ -53,6 +57,9 @@ export default defineConfig({
         options.conditions = ["import", "module", "require", "default"];
         options.define = {
             "process.env.NODE_DEBUG": "false",
+            // Add global definitions for Node.js built-ins
+            "global.Buffer": "Buffer",
+            "global.process": "process",
         };
         // Add pattern matching for external packages
         options.external = [
@@ -60,7 +67,8 @@ export default defineConfig({
             "playwright*",
             "@elizaos/*",
             "node:*",
-            "ws*",
         ];
+        // Add resolveExtensions to handle .js files
+        options.resolveExtensions = [".ts", ".js", ".mjs", ".cjs"];
     },
 });
