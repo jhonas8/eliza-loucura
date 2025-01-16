@@ -6,7 +6,7 @@ export default defineConfig({
     sourcemap: true,
     clean: true,
     format: ["esm"],
-    noExternal: ["playwright-core"],
+    noExternal: ["playwright-core", "puppeteer", "puppeteer-core", "ws"],
     external: [
         "dotenv",
         "fs",
@@ -43,9 +43,33 @@ export default defineConfig({
         "playwright-chromium",
         "playwright-webkit",
         "node:stream",
+        "node:util",
+        "node:events",
+        "node:os",
+        "node:crypto",
+        "node:buffer",
+        "node:url",
+        "node:zlib",
+        "node:net",
+        "node:tls",
+        "node:assert",
+        "node:child_process",
+        "node:worker_threads",
+        "node:perf_hooks",
+        "node:querystring",
+        "node:dns",
+        "node:punycode",
+        "node:tty",
+        "node:constants",
+        "node:string_decoder",
     ],
     esbuildOptions(options) {
         options.platform = "node";
         options.target = "node18";
+        options.mainFields = ["module", "main"];
+        options.conditions = ["import", "module", "require", "default"];
+        options.define = {
+            "process.env.NODE_DEBUG": "false",
+        };
     },
 });
