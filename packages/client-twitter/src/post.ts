@@ -45,7 +45,7 @@ Your personality traits: ${this.runtime.character.adjectives.join(", ")}.
 Your style: ${this.runtime.character.style.all.join(", ")}.
 Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 
-Write an engaging tweet about this Binance ${isNews ? "news article" : "announcement"}:
+Write a professional, analytical tweet about this Binance ${isNews ? "news article" : "announcement"}:
 
 Title: ${article.title}
 Content: ${article.content ? article.content.substring(0, 500) : ""}...
@@ -53,15 +53,29 @@ Content: ${article.content ? article.content.substring(0, 500) : ""}...
 Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
 
-The tweet should:
-1. Be informative but concise
-2. Include the most important points from the article
-3. Use appropriate crypto terminology
-4. Be engaging and professional
-5. Not exceed ${requestShorter ? "200" : "280"} characters
-6. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
-7. Add relevant hashtags (max 2)
-8. Maintain your unique personality traits and style${requestShorter ? "\n9. Make it shorter than the previous attempt" : ""}
+Structure your tweet in this format:
+1. Headline (1-2 lines): Key insight or main event
+2. Supporting Data:
+   - Market metrics (volume, holders, TVL)
+   - Price action and trends
+   - Comparative analysis with similar events/projects
+3. Market Stance/Call to Action:
+   - "Good entry" - for positive opportunities
+   - "Watching" - for developing situations
+   - "Capitalizing" - for active market plays
+
+Guidelines:
+1. Use a professional, analytical tone
+2. Focus on data-driven insights and metrics
+3. Include both primary and secondary market implications
+4. Highlight key market indicators (volume trends, holder changes)
+5. NO hashtags or emojis
+6. Include relevant crypto symbols (e.g. $BTC, $ETH)
+7. End with a clear market stance or call to action
+8. Not exceed ${requestShorter ? "200" : "280"} characters${requestShorter ? "\n9. Make it shorter than the previous attempt" : ""}
+
+Example format:
+"$TOKEN: Key event/announcement. Supporting metrics: 24h volume +20%, holders +5%, TVL $100M (+15%). Secondary impact: sector-wide implications. Market stance: Watching for breakout."
 
 Write only the tweet text:`;
 
