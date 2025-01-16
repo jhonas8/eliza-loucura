@@ -18,43 +18,18 @@ const twitterUsernameSchema = z
  */
 export const twitterEnvSchema = z.object({
     TWITTER_DRY_RUN: z.boolean(),
+    TWITTER_API_KEY: z.string().min(1, "Twitter API key is required"),
+    TWITTER_API_SECRET: z.string().min(1, "Twitter API secret is required"),
+    TWITTER_ACCESS_TOKEN: z.string().min(1, "Twitter access token is required"),
+    TWITTER_ACCESS_TOKEN_SECRET: z
+        .string()
+        .min(1, "Twitter access token secret is required"),
     TWITTER_USERNAME: z.string().min(1, "X/Twitter username is required"),
-    TWITTER_PASSWORD: z.string().min(1, "X/Twitter password is required"),
-    TWITTER_EMAIL: z.string().email("Valid X/Twitter email is required"),
     MAX_TWEET_LENGTH: z.number().int().default(DEFAULT_MAX_TWEET_LENGTH),
     TWITTER_SEARCH_ENABLE: z.boolean().default(false),
-    TWITTER_2FA_SECRET: z.string(),
     TWITTER_RETRY_LIMIT: z.number().int(),
     TWITTER_POLL_INTERVAL: z.number().int(),
     TWITTER_TARGET_USERS: z.array(twitterUsernameSchema).default([]),
-    // I guess it's possible to do the transformation with zod
-    // not sure it's preferable, maybe a readability issue
-    // since more people will know js/ts than zod
-    /*
-        z
-        .string()
-        .transform((val) => val.trim())
-        .pipe(
-            z.string()
-                .transform((val) =>
-                    val ? val.split(',').map((u) => u.trim()).filter(Boolean) : []
-                )
-                .pipe(
-                    z.array(
-                        z.string()
-                            .min(1)
-                            .max(15)
-                            .regex(
-                                /^[A-Za-z][A-Za-z0-9_]*[A-Za-z0-9]$|^[A-Za-z]$/,
-                                'Invalid Twitter username format'
-                            )
-                    )
-                )
-                .transform((users) => users.join(','))
-        )
-        .optional()
-        .default(''),
-    */
     POST_INTERVAL_MIN: z.number().int(),
     POST_INTERVAL_MAX: z.number().int(),
     ENABLE_ACTION_PROCESSING: z.boolean(),
@@ -106,21 +81,28 @@ export async function validateTwitterConfig(
                 parseBooleanFromText(
                     runtime.getSetting("TWITTER_DRY_RUN") ||
                         process.env.TWITTER_DRY_RUN
-                ) ?? false, // parseBooleanFromText return null if "", map "" to false
+                ) ?? false,
+
+            TWITTER_API_KEY:
+                runtime.getSetting("TWITTER_API_KEY") ||
+                process.env.TWITTER_API_KEY,
+
+            TWITTER_API_SECRET:
+                runtime.getSetting("TWITTER_API_SECRET") ||
+                process.env.TWITTER_API_SECRET,
+
+            TWITTER_ACCESS_TOKEN:
+                runtime.getSetting("TWITTER_ACCESS_TOKEN") ||
+                process.env.TWITTER_ACCESS_TOKEN,
+
+            TWITTER_ACCESS_TOKEN_SECRET:
+                runtime.getSetting("TWITTER_ACCESS_TOKEN_SECRET") ||
+                process.env.TWITTER_ACCESS_TOKEN_SECRET,
 
             TWITTER_USERNAME:
                 runtime.getSetting("TWITTER_USERNAME") ||
                 process.env.TWITTER_USERNAME,
 
-            TWITTER_PASSWORD:
-                runtime.getSetting("TWITTER_PASSWORD") ||
-                process.env.TWITTER_PASSWORD,
-
-            TWITTER_EMAIL:
-                runtime.getSetting("TWITTER_EMAIL") ||
-                process.env.TWITTER_EMAIL,
-
-            // number as string?
             MAX_TWEET_LENGTH: safeParseInt(
                 runtime.getSetting("MAX_TWEET_LENGTH") ||
                     process.env.MAX_TWEET_LENGTH,
@@ -133,61 +115,47 @@ export async function validateTwitterConfig(
                         process.env.TWITTER_SEARCH_ENABLE
                 ) ?? false,
 
-            // string passthru
-            TWITTER_2FA_SECRET:
-                runtime.getSetting("TWITTER_2FA_SECRET") ||
-                process.env.TWITTER_2FA_SECRET ||
-                "",
-
-            // int
             TWITTER_RETRY_LIMIT: safeParseInt(
                 runtime.getSetting("TWITTER_RETRY_LIMIT") ||
                     process.env.TWITTER_RETRY_LIMIT,
                 5
             ),
 
-            // int in seconds
             TWITTER_POLL_INTERVAL: safeParseInt(
                 runtime.getSetting("TWITTER_POLL_INTERVAL") ||
                     process.env.TWITTER_POLL_INTERVAL,
-                120 // 2m
+                120
             ),
 
-            // comma separated string
             TWITTER_TARGET_USERS: parseTargetUsers(
                 runtime.getSetting("TWITTER_TARGET_USERS") ||
                     process.env.TWITTER_TARGET_USERS
             ),
 
-            // int in minutes
             POST_INTERVAL_MIN: safeParseInt(
                 runtime.getSetting("POST_INTERVAL_MIN") ||
                     process.env.POST_INTERVAL_MIN,
-                90 // 1.5 hours
+                90
             ),
 
-            // int in minutes
             POST_INTERVAL_MAX: safeParseInt(
                 runtime.getSetting("POST_INTERVAL_MAX") ||
                     process.env.POST_INTERVAL_MAX,
-                180 // 3 hours
+                180
             ),
 
-            // bool
             ENABLE_ACTION_PROCESSING:
                 parseBooleanFromText(
                     runtime.getSetting("ENABLE_ACTION_PROCESSING") ||
                         process.env.ENABLE_ACTION_PROCESSING
                 ) ?? false,
 
-            // init in minutes (min 1m)
             ACTION_INTERVAL: safeParseInt(
                 runtime.getSetting("ACTION_INTERVAL") ||
                     process.env.ACTION_INTERVAL,
-                5 // 5 minutes
+                5
             ),
 
-            // bool
             POST_IMMEDIATELY:
                 parseBooleanFromText(
                     runtime.getSetting("POST_IMMEDIATELY") ||
