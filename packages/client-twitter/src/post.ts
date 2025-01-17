@@ -45,7 +45,7 @@ Your personality traits: ${this.runtime.character.adjectives.join(", ")}.
 Your style: ${this.runtime.character.style.all.join(", ")}.
 Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 
-Write a professional, analytical tweet about this Binance ${isNews ? "news article" : "announcement"}:
+Write an engaging tweet about this Binance ${isNews ? "news article" : "announcement"}:
 
 Title: ${article.title}
 Content: ${article.content ? article.content.substring(0, 500) : ""}...
@@ -53,31 +53,24 @@ Content: ${article.content ? article.content.substring(0, 500) : ""}...
 Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
 
-Structure your tweet in this format:
-1. Headline (1-2 lines): Key insight or main event
-2. Supporting Data:
-   - Market metrics (volume, holders, TVL)
-   - Price action and trends
-   - Comparative analysis with similar events/projects
-3. Market Stance/Call to Action:
-   - "Good entry" - for positive opportunities
-   - "Watching" - for developing situations
-   - "Capitalizing" - for active market plays
+The tweet should:
+1. Summarize the key points in a concise way and include your opinion
+2. Use informal tone and style common in crypto Twitter (for younger audience)
+3. Include crypto slang and abbreviations when relevant (e.g., WAGMI, gm, HODL)
+4. Use line breaks strategically for better readability
+5. Not exceed ${requestShorter ? "200" : "280"} characters
+6. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
+7. Only use hashtags if they add significant value to the content (max 2, and optional)
+8. Maintain your unique personality traits and style${requestShorter ? "\n9. Make it shorter than the previous attempt" : ""}
 
-Guidelines:
-1. Use a professional, analytical tone
-2. Focus on data-driven insights and metrics
-3. Include both primary and secondary market implications
-4. Highlight key market indicators (volume trends, holder changes)
-5. NO hashtags or emojis
-6. Include relevant crypto symbols (e.g. $BTC, $ETH)
-7. End with a clear market stance or call to action
-8. Not exceed ${requestShorter ? "200" : "280"} characters${requestShorter ? "\n9. Make it shorter than the previous attempt" : ""}
+Format example:
+Key update in one line
 
-Example format:
-"$TOKEN: Key event/announcement. Supporting metrics: 24h volume +20%, holders +5%, TVL $100M (+15%). Secondary impact: sector-wide implications. Market stance: Watching for breakout."
+Your opinion/reaction
 
-Write only the tweet text:`;
+Additional context (if needed)
+
+Write the tweet text without any surrounding quotes:`;
 
             const response = await this.textGenService.queueTextCompletion(
                 prompt,
