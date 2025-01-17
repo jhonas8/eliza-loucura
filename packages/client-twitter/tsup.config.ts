@@ -13,7 +13,6 @@ export default defineConfig({
         "bufferutil",
         "utf-8-validate",
         "stream/web",
-        "agentkeepalive",
         "form-data-encoder",
         "formdata-node",
         "abort-controller",
@@ -33,6 +32,10 @@ export default defineConfig({
         "@elizaos/*",
         "puppeteer*",
         "playwright*",
+        // Dependencies with Node.js built-in requirements
+        "agentkeepalive",
+        "keep-alive-agent",
+        "humanize-ms",
     ],
     esbuildOptions(options) {
         options.platform = "node";
