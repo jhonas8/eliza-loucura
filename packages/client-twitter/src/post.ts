@@ -60,7 +60,7 @@ The tweet should:
 4. Use line breaks strategically for better readability
 5. Not exceed ${requestShorter ? "200" : "280"} characters
 6. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
-7. Only use hashtags if they add significant value to the content (max 2, and optional)
+7. Do not use any emojis or hashtags
 8. Maintain your unique personality traits and style${requestShorter ? "\n9. Make it shorter than the previous attempt" : ""}
 
 Format example:
