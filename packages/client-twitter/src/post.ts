@@ -37,6 +37,21 @@ export class TwitterPostClient {
             throw new Error("Text generation service not available");
         }
 
+        const cleanTweetText = (text: string): string => {
+            // Remove emojis
+            const emojiRegex =
+                /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F000}-\u{1F02F}]|[\u{1F0A0}-\u{1F0FF}]|[\u{1F100}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{2B00}-\u{2BFF}]|[\u{2900}-\u{297F}]|[\u{2B00}-\u{2BFF}]|[\u{1F600}-\u{1F64F}]/gu;
+
+            // Remove hashtags (both the symbol and word)
+            const hashtagRegex = /#\w+/g;
+
+            return text
+                .replace(emojiRegex, "")
+                .replace(hashtagRegex, "")
+                .replace(/\s+/g, " ")
+                .trim();
+        };
+
         const generateTweet = async (
             requestShorter: boolean = false
         ): Promise<string> => {
@@ -81,7 +96,7 @@ Write the tweet text without any surrounding quotes:`;
                 280
             );
 
-            return response.trim();
+            return cleanTweetText(response.trim());
         };
 
         let tweetText = await generateTweet();
