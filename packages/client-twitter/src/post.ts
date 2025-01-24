@@ -9,11 +9,13 @@ import {
     BinanceSquareScraper,
     BinanceSquareArticle,
 } from "./scrapers/binanceSquare";
+import { BNBChainScraper, BNBChainArticle } from "./scrapers/bnbChain";
 import { OpenAIService } from "../../plugin-node/src/services/openai";
 
 export class TwitterPostClient {
     private binanceScraper: BinanceScraper;
     private binanceSquareScraper: BinanceSquareScraper;
+    private bnbChainScraper: BNBChainScraper;
     private textGenService: ITextGenerationService;
 
     constructor(
@@ -22,6 +24,7 @@ export class TwitterPostClient {
     ) {
         this.binanceScraper = new BinanceScraper();
         this.binanceSquareScraper = new BinanceSquareScraper();
+        this.bnbChainScraper = new BNBChainScraper();
 
         // Initialize OpenAI service
         this.textGenService = new OpenAIService();
@@ -30,7 +33,7 @@ export class TwitterPostClient {
     }
 
     private async generateTweetFromArticle(
-        article: BinanceArticle | BinanceSquareArticle,
+        article: BinanceArticle | BinanceSquareArticle | BNBChainArticle,
         isNews: boolean = false
     ): Promise<string> {
         if (!this.textGenService) {
@@ -202,14 +205,61 @@ Write the tweet text without any surrounding quotes:`;
         }
     }
 
+    private async checkAndTweetNewBNBChainPost(): Promise<void> {
+        try {
+            const article = await this.bnbChainScraper.getLatestArticle();
+
+            if (!article) {
+                elizaLogger.warn("No BNB Chain article found");
+                return;
+            }
+
+            // Check if we've already tweeted about this article
+            const lastProcessedUrl =
+                await this.runtime.cacheManager.get<string>(
+                    "twitter/last_bnbchain_url"
+                );
+
+            if (lastProcessedUrl === article.url) {
+                elizaLogger.info("BNB Chain article already tweeted");
+                return;
+            }
+
+            // Generate and post the tweet
+            const tweetText = await this.generateTweetFromArticle(
+                article,
+                true
+            );
+
+            if (this.client.twitterConfig.TWITTER_DRY_RUN) {
+                elizaLogger.info("Dry run mode - would tweet:", tweetText);
+            } else {
+                await this.client.twitterClient.sendTweet(tweetText);
+                elizaLogger.info(
+                    "Successfully tweeted about new BNB Chain article"
+                );
+
+                // Cache the processed article URL
+                await this.runtime.cacheManager.set(
+                    "twitter/last_bnbchain_url",
+                    article.url,
+                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
+                );
+            }
+        } catch (error) {
+            elizaLogger.error("Error in checkAndTweetNewBNBChainPost:", error);
+        }
+    }
+
     async start() {
-        elizaLogger.log("Starting Binance content monitoring...");
+        elizaLogger.log("Starting content monitoring...");
 
         // Check for new content every minute
         setInterval(
             async () => {
                 await this.checkAndTweetNewAnnouncement();
                 await this.checkAndTweetNewNews();
+                await this.checkAndTweetNewBNBChainPost();
             },
             60 * 1000 // 1 minute
         );
@@ -217,5 +267,6 @@ Write the tweet text without any surrounding quotes:`;
         // Initial checks
         await this.checkAndTweetNewAnnouncement();
         await this.checkAndTweetNewNews();
+        await this.checkAndTweetNewBNBChainPost();
     }
 }
