@@ -4,18 +4,16 @@ import {
     ITextGenerationService,
 } from "@elizaos/core";
 import { ClientBase } from "./base.ts";
-import { BinanceScraper, BinanceArticle } from "./scrapers/binance.ts";
-import {
-    BinanceSquareScraper,
-    BinanceSquareArticle,
-} from "./scrapers/binanceSquare";
 import { BNBChainScraper, BNBChainArticle } from "./scrapers/bnbChain";
+import {
+    BinanceAcademyScraper,
+    AcademyArticle,
+} from "./scrapers/binanceAcademy";
 import { OpenAIService } from "../../plugin-node/src/services/openai";
 
 export class TwitterPostClient {
-    private binanceScraper: BinanceScraper;
-    private binanceSquareScraper: BinanceSquareScraper;
     private bnbChainScraper: BNBChainScraper;
+    private academyScraper: BinanceAcademyScraper;
     private textGenService: ITextGenerationService;
     private isProcessing: boolean = false;
     private readonly cacheKeys = {
@@ -28,9 +26,8 @@ export class TwitterPostClient {
         private client: ClientBase,
         private runtime: IAgentRuntime
     ) {
-        this.binanceScraper = new BinanceScraper();
-        this.binanceSquareScraper = new BinanceSquareScraper();
         this.bnbChainScraper = new BNBChainScraper();
+        this.academyScraper = new BinanceAcademyScraper();
 
         // Initialize OpenAI service
         this.textGenService = new OpenAIService();
@@ -55,8 +52,8 @@ export class TwitterPostClient {
     }
 
     private async generateTweetFromArticle(
-        article: BinanceArticle | BinanceSquareArticle | BNBChainArticle,
-        isNews: boolean = false
+        article: BNBChainArticle | AcademyArticle,
+        isAcademy: boolean = false
     ): Promise<string> {
         if (!this.textGenService) {
             throw new Error("Text generation service not available");
@@ -85,10 +82,16 @@ Your personality traits: ${this.runtime.character.adjectives.join(", ")}.
 Your style: ${this.runtime.character.style.all.join(", ")}.
 Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 
-Write an engaging tweet about this Binance ${isNews ? "news article" : "announcement"}:
+As a BNB Chain ecosystem expert, write an engaging and educational tweet about this ${isAcademy ? "educational article" : "news update"}. Focus on explaining the significance and impact on the BNB Chain ecosystem:
 
 Title: ${article.title}
 Content: ${article.content ? article.content.substring(0, 500) : ""}...
+${
+    isAcademy
+        ? `Difficulty: ${(article as AcademyArticle).difficulty}
+Categories: ${(article as AcademyArticle).categories.join(", ")}`
+        : ""
+}
 
 Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
@@ -261,7 +264,7 @@ Write the tweet text without any surrounding quotes:`;
 
             const tweetText = await this.generateTweetFromArticle(
                 article,
-                true
+                false
             );
             const success = await this.tryPostTweet(
                 tweetText,
@@ -279,27 +282,49 @@ Write the tweet text without any surrounding quotes:`;
         }
     }
 
-    private async processAllSources(): Promise<void> {
-        if (this.isProcessing) {
-            elizaLogger.warn("Already processing sources, skipping this cycle");
-            return;
-        }
-
-        this.isProcessing = true;
+    private async checkAndTweetNewAcademyPost(): Promise<void> {
         try {
-            // Process sources sequentially
-            elizaLogger.info("Checking Binance announcements...");
-            await this.checkAndTweetNewAnnouncement();
+            const article = await this.academyScraper.getLatestArticle();
 
-            elizaLogger.info("Checking Binance news...");
-            await this.checkAndTweetNewNews();
+            if (!article) {
+                elizaLogger.warn("No Academy article found");
+                return;
+            }
 
-            elizaLogger.info("Checking BNB Chain posts...");
-            await this.checkAndTweetNewBNBChainPost();
+            // Check if we've already tweeted about this article
+            const lastProcessedUrl =
+                await this.runtime.cacheManager.get<string>(
+                    "twitter/last_academy_url"
+                );
+
+            if (lastProcessedUrl === article.url) {
+                elizaLogger.info("Academy article already tweeted");
+                return;
+            }
+
+            // Generate and post the tweet
+            const tweetText = await this.generateTweetFromArticle(
+                article,
+                true
+            );
+
+            if (this.client.twitterConfig.TWITTER_DRY_RUN) {
+                elizaLogger.info("Dry run mode - would tweet:", tweetText);
+            } else {
+                await this.client.twitterClient.sendTweet(tweetText);
+                elizaLogger.info(
+                    "Successfully tweeted about new Academy article"
+                );
+
+                // Cache the processed article URL
+                await this.runtime.cacheManager.set(
+                    "twitter/last_academy_url",
+                    article.url,
+                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
+                );
+            }
         } catch (error) {
-            elizaLogger.error("Error in processAllSources:", error);
-        } finally {
-            this.isProcessing = false;
+            elizaLogger.error("Error in checkAndTweetNewAcademyPost:", error);
         }
     }
 
@@ -314,8 +339,15 @@ Write the tweet text without any surrounding quotes:`;
 
         // Check for new content every minute
         setInterval(
-            () => this.processAllSources(),
+            async () => {
+                await this.checkAndTweetNewBNBChainPost();
+                await this.checkAndTweetNewAcademyPost();
+            },
             60 * 1000 // 1 minute
         );
+
+        // Initial checks
+        await this.checkAndTweetNewBNBChainPost();
+        await this.checkAndTweetNewAcademyPost();
     }
 }
