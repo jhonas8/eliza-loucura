@@ -17,6 +17,7 @@ export class TwitterPostClient {
     private binanceSquareScraper: BinanceSquareScraper;
     private bnbChainScraper: BNBChainScraper;
     private textGenService: ITextGenerationService;
+    private isProcessing: boolean = false;
 
     constructor(
         private client: ClientBase,
@@ -113,6 +114,33 @@ Write the tweet text without any surrounding quotes:`;
         return tweetText;
     }
 
+    private async tryPostTweet(
+        tweetText: string,
+        cacheKey: string,
+        articleUrl: string
+    ): Promise<boolean> {
+        try {
+            if (this.client.twitterConfig.TWITTER_DRY_RUN) {
+                elizaLogger.info("Dry run mode - would tweet:", tweetText);
+                return true;
+            }
+
+            await this.client.twitterClient.sendTweet(tweetText);
+
+            // Only cache after successful tweet
+            await this.runtime.cacheManager.set(
+                cacheKey,
+                articleUrl,
+                { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
+            );
+
+            return true;
+        } catch (error) {
+            elizaLogger.error(`Error posting tweet: ${error}`);
+            return false;
+        }
+    }
+
     private async checkAndTweetNewAnnouncement(): Promise<void> {
         try {
             const article = await this.binanceScraper.getLatestArticle();
@@ -122,36 +150,28 @@ Write the tweet text without any surrounding quotes:`;
                 return;
             }
 
-            // Check if we've already tweeted about this article
+            const cacheKey = "twitter/last_binance_announcement_url";
             const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(
-                    "twitter/last_binance_announcement_url"
-                );
+                await this.runtime.cacheManager.get<string>(cacheKey);
 
             if (lastProcessedUrl === article.url) {
                 elizaLogger.info("Announcement already tweeted");
                 return;
             }
 
-            // Generate and post the tweet
             const tweetText = await this.generateTweetFromArticle(
                 article,
                 false
             );
+            const success = await this.tryPostTweet(
+                tweetText,
+                cacheKey,
+                article.url
+            );
 
-            if (this.client.twitterConfig.TWITTER_DRY_RUN) {
-                elizaLogger.info("Dry run mode - would tweet:", tweetText);
-            } else {
-                await this.client.twitterClient.sendTweet(tweetText);
+            if (success) {
                 elizaLogger.info(
                     "Successfully tweeted about new Binance announcement"
-                );
-
-                // Cache the processed article URL
-                await this.runtime.cacheManager.set(
-                    "twitter/last_binance_announcement_url",
-                    article.url,
-                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
                 );
             }
         } catch (error) {
@@ -168,36 +188,28 @@ Write the tweet text without any surrounding quotes:`;
                 return;
             }
 
-            // Check if we've already tweeted about this article
+            const cacheKey = "twitter/last_binance_news_url";
             const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(
-                    "twitter/last_binance_news_url"
-                );
+                await this.runtime.cacheManager.get<string>(cacheKey);
 
             if (lastProcessedUrl === article.url) {
                 elizaLogger.info("News article already tweeted");
                 return;
             }
 
-            // Generate and post the tweet
             const tweetText = await this.generateTweetFromArticle(
                 article,
                 true
             );
+            const success = await this.tryPostTweet(
+                tweetText,
+                cacheKey,
+                article.url
+            );
 
-            if (this.client.twitterConfig.TWITTER_DRY_RUN) {
-                elizaLogger.info("Dry run mode - would tweet:", tweetText);
-            } else {
-                await this.client.twitterClient.sendTweet(tweetText);
+            if (success) {
                 elizaLogger.info(
                     "Successfully tweeted about new Binance news article"
-                );
-
-                // Cache the processed article URL
-                await this.runtime.cacheManager.set(
-                    "twitter/last_binance_news_url",
-                    article.url,
-                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
                 );
             }
         } catch (error) {
@@ -214,36 +226,28 @@ Write the tweet text without any surrounding quotes:`;
                 return;
             }
 
-            // Check if we've already tweeted about this article
+            const cacheKey = "twitter/last_bnbchain_url";
             const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(
-                    "twitter/last_bnbchain_url"
-                );
+                await this.runtime.cacheManager.get<string>(cacheKey);
 
             if (lastProcessedUrl === article.url) {
                 elizaLogger.info("BNB Chain article already tweeted");
                 return;
             }
 
-            // Generate and post the tweet
             const tweetText = await this.generateTweetFromArticle(
                 article,
                 true
             );
+            const success = await this.tryPostTweet(
+                tweetText,
+                cacheKey,
+                article.url
+            );
 
-            if (this.client.twitterConfig.TWITTER_DRY_RUN) {
-                elizaLogger.info("Dry run mode - would tweet:", tweetText);
-            } else {
-                await this.client.twitterClient.sendTweet(tweetText);
+            if (success) {
                 elizaLogger.info(
                     "Successfully tweeted about new BNB Chain article"
-                );
-
-                // Cache the processed article URL
-                await this.runtime.cacheManager.set(
-                    "twitter/last_bnbchain_url",
-                    article.url,
-                    { expires: Date.now() + 24 * 60 * 60 * 1000 } // 24 hours
                 );
             }
         } catch (error) {
@@ -251,22 +255,40 @@ Write the tweet text without any surrounding quotes:`;
         }
     }
 
+    private async processAllSources(): Promise<void> {
+        if (this.isProcessing) {
+            elizaLogger.warn("Already processing sources, skipping this cycle");
+            return;
+        }
+
+        this.isProcessing = true;
+        try {
+            // Process sources sequentially
+            elizaLogger.info("Checking Binance announcements...");
+            await this.checkAndTweetNewAnnouncement();
+
+            elizaLogger.info("Checking Binance news...");
+            await this.checkAndTweetNewNews();
+
+            elizaLogger.info("Checking BNB Chain posts...");
+            await this.checkAndTweetNewBNBChainPost();
+        } catch (error) {
+            elizaLogger.error("Error in processAllSources:", error);
+        } finally {
+            this.isProcessing = false;
+        }
+    }
+
     async start() {
         elizaLogger.log("Starting content monitoring...");
 
+        // Initial check
+        await this.processAllSources();
+
         // Check for new content every minute
         setInterval(
-            async () => {
-                await this.checkAndTweetNewAnnouncement();
-                await this.checkAndTweetNewNews();
-                await this.checkAndTweetNewBNBChainPost();
-            },
+            () => this.processAllSources(),
             60 * 1000 // 1 minute
         );
-
-        // Initial checks
-        await this.checkAndTweetNewAnnouncement();
-        await this.checkAndTweetNewNews();
-        await this.checkAndTweetNewBNBChainPost();
     }
 }
