@@ -165,84 +165,6 @@ Write the tweet text without any surrounding quotes:`;
         }
     }
 
-    private async checkAndTweetNewAnnouncement(): Promise<void> {
-        try {
-            const article = await this.binanceScraper.getLatestArticle();
-
-            if (!article) {
-                elizaLogger.warn("No announcement found");
-                return;
-            }
-
-            const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(
-                    this.cacheKeys.binanceAnnouncement
-                );
-
-            if (lastProcessedUrl === article.url) {
-                elizaLogger.info("Announcement already tweeted");
-                return;
-            }
-
-            const tweetText = await this.generateTweetFromArticle(
-                article,
-                false
-            );
-            const success = await this.tryPostTweet(
-                tweetText,
-                this.cacheKeys.binanceAnnouncement,
-                article.url
-            );
-
-            if (success) {
-                elizaLogger.info(
-                    "Successfully tweeted about new Binance announcement"
-                );
-            }
-        } catch (error) {
-            elizaLogger.error("Error in checkAndTweetNewAnnouncement:", error);
-        }
-    }
-
-    private async checkAndTweetNewNews(): Promise<void> {
-        try {
-            const article = await this.binanceSquareScraper.getLatestArticle();
-
-            if (!article) {
-                elizaLogger.warn("No news article found");
-                return;
-            }
-
-            const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(
-                    this.cacheKeys.binanceNews
-                );
-
-            if (lastProcessedUrl === article.url) {
-                elizaLogger.info("News article already tweeted");
-                return;
-            }
-
-            const tweetText = await this.generateTweetFromArticle(
-                article,
-                true
-            );
-            const success = await this.tryPostTweet(
-                tweetText,
-                this.cacheKeys.binanceNews,
-                article.url
-            );
-
-            if (success) {
-                elizaLogger.info(
-                    "Successfully tweeted about new Binance news article"
-                );
-            }
-        } catch (error) {
-            elizaLogger.error("Error in checkAndTweetNewNews:", error);
-        }
-    }
-
     private async checkAndTweetNewBNBChainPost(): Promise<void> {
         try {
             const article = await this.bnbChainScraper.getLatestArticle();
@@ -333,9 +255,6 @@ Write the tweet text without any surrounding quotes:`;
 
         // Clear cache on startup
         await this.clearCache();
-
-        // Initial check
-        await this.processAllSources();
 
         // Check for new content every minute
         setInterval(
