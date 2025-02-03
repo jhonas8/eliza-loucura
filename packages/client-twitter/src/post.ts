@@ -18,6 +18,11 @@ export class TwitterPostClient {
     private bnbChainScraper: BNBChainScraper;
     private textGenService: ITextGenerationService;
     private isProcessing: boolean = false;
+    private readonly cacheKeys = {
+        binanceAnnouncement: "twitter/last_binance_announcement_url",
+        binanceNews: "twitter/last_binance_news_url",
+        bnbChain: "twitter/last_bnbchain_url",
+    };
 
     constructor(
         private client: ClientBase,
@@ -31,6 +36,22 @@ export class TwitterPostClient {
         this.textGenService = new OpenAIService();
         this.textGenService.initialize(this.runtime);
         this.runtime.registerService(this.textGenService);
+    }
+
+    private async clearCache(): Promise<void> {
+        elizaLogger.info("Clearing tweet cache on startup...");
+        try {
+            await Promise.all([
+                this.runtime.cacheManager.delete(
+                    this.cacheKeys.binanceAnnouncement
+                ),
+                this.runtime.cacheManager.delete(this.cacheKeys.binanceNews),
+                this.runtime.cacheManager.delete(this.cacheKeys.bnbChain),
+            ]);
+            elizaLogger.info("Tweet cache cleared successfully");
+        } catch (error) {
+            elizaLogger.error("Error clearing tweet cache:", error);
+        }
     }
 
     private async generateTweetFromArticle(
@@ -150,9 +171,10 @@ Write the tweet text without any surrounding quotes:`;
                 return;
             }
 
-            const cacheKey = "twitter/last_binance_announcement_url";
             const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(cacheKey);
+                await this.runtime.cacheManager.get<string>(
+                    this.cacheKeys.binanceAnnouncement
+                );
 
             if (lastProcessedUrl === article.url) {
                 elizaLogger.info("Announcement already tweeted");
@@ -165,7 +187,7 @@ Write the tweet text without any surrounding quotes:`;
             );
             const success = await this.tryPostTweet(
                 tweetText,
-                cacheKey,
+                this.cacheKeys.binanceAnnouncement,
                 article.url
             );
 
@@ -188,9 +210,10 @@ Write the tweet text without any surrounding quotes:`;
                 return;
             }
 
-            const cacheKey = "twitter/last_binance_news_url";
             const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(cacheKey);
+                await this.runtime.cacheManager.get<string>(
+                    this.cacheKeys.binanceNews
+                );
 
             if (lastProcessedUrl === article.url) {
                 elizaLogger.info("News article already tweeted");
@@ -203,7 +226,7 @@ Write the tweet text without any surrounding quotes:`;
             );
             const success = await this.tryPostTweet(
                 tweetText,
-                cacheKey,
+                this.cacheKeys.binanceNews,
                 article.url
             );
 
@@ -226,9 +249,10 @@ Write the tweet text without any surrounding quotes:`;
                 return;
             }
 
-            const cacheKey = "twitter/last_bnbchain_url";
             const lastProcessedUrl =
-                await this.runtime.cacheManager.get<string>(cacheKey);
+                await this.runtime.cacheManager.get<string>(
+                    this.cacheKeys.bnbChain
+                );
 
             if (lastProcessedUrl === article.url) {
                 elizaLogger.info("BNB Chain article already tweeted");
@@ -241,7 +265,7 @@ Write the tweet text without any surrounding quotes:`;
             );
             const success = await this.tryPostTweet(
                 tweetText,
-                cacheKey,
+                this.cacheKeys.bnbChain,
                 article.url
             );
 
@@ -281,6 +305,9 @@ Write the tweet text without any surrounding quotes:`;
 
     async start() {
         elizaLogger.log("Starting content monitoring...");
+
+        // Clear cache on startup
+        await this.clearCache();
 
         // Initial check
         await this.processAllSources();
