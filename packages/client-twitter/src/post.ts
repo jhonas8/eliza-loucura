@@ -63,7 +63,7 @@ Your personality traits: ${this.runtime.character.adjectives.join(", ")}.
 Your style: ${this.runtime.character.style.all.join(", ")}.
 Your knowledge areas: ${this.runtime.character.knowledge.join(", ")}.
 
-As a BNB Chain ecosystem expert, write an engaging and educational tweet about this ${isNews ? "news article" : "announcement"}. Focus on explaining the significance and impact on the BNB Chain ecosystem:
+Write an engaging tweet about this Binance ${isNews ? "news article" : "announcement"}:
 
 Title: ${article.title}
 Content: ${article.content ? article.content.substring(0, 500) : ""}...
@@ -72,18 +72,21 @@ Example tweets from you:
 ${this.runtime.character.postExamples.join("\n")}
 
 The tweet should:
-1. Start with a clear, concise summary of the key update or development
-2. Add your expert analysis or opinion on its significance for BNB Chain
-3. Include relevant technical context or educational insights when appropriate
-4. Use informal crypto Twitter style for better engagement (e.g., WAGMI, gm, HODL)
-5. Structure the tweet with line breaks for better readability:
-   - Key update/news
-   - Your analysis/opinion
-   - Technical context or tips (if relevant)
-6. Not exceed ${requestShorter ? "200" : "280"} characters
-7. Include relevant crypto symbols if mentioned (e.g. $BNB, $BTC)
-8. Do not use any emojis or hashtags
-9. Maintain your unique personality traits and style${requestShorter ? "\n10. Make it shorter than the previous attempt" : ""}
+1. Summarize the key points in a concise way and include your opinion
+2. Use informal tone and style common in crypto Twitter (for younger audience)
+3. Include crypto slang and abbreviations when relevant (e.g., WAGMI, gm, HODL)
+4. Use line breaks strategically for better readability
+5. Not exceed ${requestShorter ? "200" : "280"} characters
+6. Include relevant crypto symbols if mentioned (e.g. $BTC, $ETH)
+7. Do not use any emojis or hashtags, remove any hashtags from the article. Do not use any emojis or hashtags.
+8. Maintain your unique personality traits and style${requestShorter ? "\n9. Make it shorter than the previous attempt" : ""}
+
+Format example:
+Key update in one line
+
+Your opinion/reaction
+
+Additional context (if needed)
 
 Write the tweet text without any surrounding quotes:`;
 
